@@ -64,7 +64,7 @@ handle_extension() {
             exit 1;;
         7z)
             ## Avoid password prompt by providing empty password
-            7z l -p -- "${FILE_PATH}" && exit 5
+            7zz l -p -- "${FILE_PATH}" && exit 5
             exit 1;;
 
         ## PDF
@@ -150,10 +150,10 @@ handle_image() {
             exit 1;;
 
         ## DjVu
-        # image/vnd.djvu)
-        #     ddjvu -format=tiff -quality=90 -page=1 -size="${DEFAULT_SIZE}" \
-        #           - "${IMAGE_CACHE_PATH}" < "${FILE_PATH}" \
-        #           && exit 6 || exit 1;;
+        image/vnd.djvu)
+            ddjvu -format=tiff -quality=90 -page=1 -size="${DEFAULT_SIZE}" \
+                  - "${IMAGE_CACHE_PATH}" < "${FILE_PATH}" \
+                  && exit 6 || exit 1;;
 
         ## Image
         image/*)

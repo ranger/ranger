@@ -1,40 +1,18 @@
-" Compatible with ranger 1.4.2 through 1.7.*
+" To add Ranger as a file chooser in (Neo)Vim, go to 
+" https://github.com/Konfekt/filepicker.vim/blob/main/plugin/filepicker.vim
+" and either
 "
-" Add ranger as a file chooser in vim
+" - copy the content of this file to your ~/.vimrc resp. ~/.config/nvim/init.vim,
+" - or put it into ~/.vim/plugin respectively ~/.config/nvim/plugin,
+" - or source this file directly:
+"
+"     let s:fp = "/path/to/filepicker.vim"
+"     if filereadable(s:fp) | exec "source" s:fp | endif
+"     unlet s:fp
 "
 " If you add this code to the .vimrc, ranger can be started using the command
-" ":RangerChooser" or the keybinding "<leader>r".  Once you select one or more
+" ":FilePicker" or the keybinding "-".  Once you select one or more
 " files, press enter and ranger will quit again and vim will open the selected
 " files.
 
-function! RangeChooser()
-    let temp = tempname()
-    " The option "--choosefiles" was added in ranger 1.5.1. Use the next line
-    " with ranger 1.4.2 through 1.5.0 instead.
-    "exec 'silent !ranger --choosefile=' . shellescape(temp)
-    if has("gui_running")
-        exec 'silent !xterm -e ranger --choosefiles=' . shellescape(temp)
-    else
-        exec 'silent !ranger --choosefiles=' . shellescape(temp)
-    endif
-    if !filereadable(temp)
-        redraw!
-        " Nothing to read.
-        return
-    endif
-    let names = readfile(temp)
-    if empty(names)
-        redraw!
-        " Nothing to open.
-        return
-    endif
-    " Edit the first item.
-    exec 'edit ' . fnameescape(names[0])
-    " Add any remaining items to the arg list/buffer list.
-    for name in names[1:]
-        exec 'argadd ' . fnameescape(name)
-    endfor
-    redraw!
-endfunction
-command! -bar RangerChooser call RangeChooser()
-nnoremap <leader>r :<C-U>RangerChooser<CR>
+command! -nargs=? -bar -complete=dir RangerChooser echomsg ":RangerChooser has been deprecated in favor of :FilePicker available at https://github.com/Konfekt/filepicker.vim"

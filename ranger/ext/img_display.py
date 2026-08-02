@@ -3,6 +3,7 @@
 # Author: Emanuel Guevel, 2013
 # Author: Delisa Mason, 2015
 
+# pylint: disable=too-many-lines
 """Interface for drawing images into the console
 
 This module provides functions to draw images in the terminal using supported
@@ -22,7 +23,7 @@ import warnings
 import json
 import mmap
 import threading
-from subprocess import Popen, PIPE, check_call, CalledProcessError
+from subprocess import Popen, PIPE, check_call, check_output, CalledProcessError
 from collections import defaultdict, namedtuple
 
 import termios
@@ -42,7 +43,6 @@ if which("magick"):
 else:
     # Magick < 7
     MAGICK_CONVERT_CMD_BASE = ("convert",)
-
 
 W3MIMGDISPLAY_ENV = "W3MIMGDISPLAY_PATH"
 W3MIMGDISPLAY_OPTIONS = []
@@ -93,7 +93,9 @@ def get_font_dimensions():
     return (xpixels // cols), (ypixels // rows)
 
 
-def image_fit_width(width, height, max_cols, max_rows, font_width=None, font_height=None):
+def image_fit_width(  # pylint: disable=too-many-positional-arguments
+    width, height, max_cols, max_rows, font_width=None, font_height=None
+):
     if font_width is None or font_height is None:
         font_width, font_height = get_font_dimensions()
 
@@ -161,6 +163,7 @@ class ImageDisplayer(object):
 
     working_dir = os.environ.get('XDG_RUNTIME_DIR', os.path.expanduser("~") or None)
 
+    # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
         """Draw an image at the given coordinates."""
 
@@ -230,6 +233,7 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
 
         return (xpixels // cols), (ypixels // rows)
 
+    # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
         if not self.is_initialized or self.process.poll() is not None:
             self.initialize()
@@ -275,6 +279,7 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         self.process.stdin.flush()
         self.process.stdout.readline()
 
+    # pylint: disable=too-many-positional-arguments
     def _generate_w3m_input(self, path, start_x, start_y, max_width, max_height):
         """Prepare the input string for w3mimgpreview
 
@@ -339,6 +344,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     Ranger must be running in iTerm2 for this to work.
     """
 
+    # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
         with temporarily_moved_cursor(start_y, start_x):
             sys.stdout.write(self._generate_iterm2_input(path, width, height))
@@ -357,7 +363,7 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
             return ""
         image_width = self._fit_width(
             image_width, image_height, max_cols, max_rows)
-        content = self._encode_image_content(path)
+        content, byte_size = self._encode_image_content(path)
         filename = self._encode_image_filename(path)
         display_protocol = "\033"
         close_protocol = "\a"
@@ -368,18 +374,17 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
         text = "{0}]1337;File=name={1};inline=1;preserveAspectRatio=0;size={2};width={3}px:{4}{5}\n".format(
             display_protocol,
             filename,
-            str(len(content)),
+            str(byte_size),
             str(int(image_width)),
             content,
             close_protocol)
         return text
 
     def _fit_width(self, width, height, max_cols, max_rows):
-        font_width = self.fm.settings.iterm2_font_width
-        font_height = self.fm.settings.iterm2_font_height
-
         return image_fit_width(
-            width, height, max_cols, max_rows, font_width, font_height
+            width, height, max_cols, max_rows,
+            font_width=self.fm.settings.iterm2_font_width,
+            font_height=self.fm.settings.iterm2_font_height
         )
 
     @staticmethod
@@ -391,7 +396,8 @@ class ITerm2ImageDisplayer(ImageDisplayer, FileManagerAware):
     def _encode_image_content(path):
         """Read and encode the contents of path"""
         with open(path, 'rb') as fobj:
-            return base64.b64encode(fobj.read()).decode('utf-8')
+            content = fobj.read()
+            return base64.b64encode(content).decode('utf-8'), len(content)
 
     @staticmethod
     def imghdr_what(path):
@@ -511,6 +517,7 @@ class SixelImageDisplayer(ImageDisplayer, FileManagerAware):
 
         return self.cache[cacheable].image
 
+    # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
         if self.win is None:
             self.win = self.fm.ui.win.subwin(height, width, start_y, start_x)
@@ -553,6 +560,7 @@ class TerminologyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.display_protocol = "\033"
         self.close_protocol = "\000"
 
+    # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
         with temporarily_moved_cursor(start_y, start_x):
             # Write intent
@@ -634,6 +642,7 @@ class URXVTImageDisplayer(ImageDisplayer, FileManagerAware):
         pct_y = 2    # TODO: Use the font size to calculate this offset.
         return pct_x, pct_y
 
+    # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
         # The coordinates in the arguments are ignored as urxvt takes
         # the coordinates in a non-standard way: the position of the
@@ -678,6 +687,7 @@ class URXVTImageFSDisplayer(URXVTImageDisplayer):
         return self._get_centered_offsets()
 
 
+# pylint: disable=too-many-instance-attributes
 @register_image_displayer("kitty")
 class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
     """Implementation of ImageDisplayer for kitty (https://github.com/kovidgoyal/kitty/)
@@ -689,9 +699,15 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
                  |  base64 encoded payload
         key: value pairs as parameters
     For more info please head over to :
-        https://github.com/kovidgoyal/kitty/blob/master/graphics-protocol.asciidoc"""
+        https://sw.kovidgoyal.net/kitty/graphics-protocol/#display-images-on-screen"""
     protocol_start = b'\x1b_G'
     protocol_end = b'\x1b\\'
+    response_end = b'c'
+    tmux_protocol_start = b'\x1bPtmux;'
+    tmux_protocol_end = b'\x1b\\'
+    diacritics = None
+    placeholder = None
+    is_tmux = False
     # we are going to use stdio in binary mode a lot, so due to py2 -> py3
     # differences is worth to do this:
     stdbout = getattr(sys.stdout, 'buffer', sys.stdout)
@@ -717,32 +733,80 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.pix_row, self.pix_col = (0, 0)
         self.temp_file_dir = None  # Only used when streaming is not an option
 
-    def _late_init(self):
-        # tmux
-        if 'kitty' not in os.environ['TERM']:
-            # this doesn't seem to work, ranger freezes...
-            # commenting out the response check does nothing
-            # self.protocol_start = b'\033Ptmux;\033' + self.protocol_start
-            # self.protocol_end += b'\033\\'
-            raise ImgDisplayUnsupportedException(
-                'kitty previews only work in'
-                + ' kitty and outside tmux. '
-                + 'Make sure your TERM contains the string "kitty"')
+    def _wrap_byte_string(self, msg):
+        # Wrap byte string into protocol.
+        # With tmux passthrough if inside tmux.
+        wrapped = b'%s%s%s' % (
+            self.protocol_start,
+            msg,
+            self.protocol_end
+        )
 
-        # automatic check if we share the filesystem using a dummy file
+        if self.is_tmux:
+            wrapped = b'%s%s%s' % (
+                self.tmux_protocol_start,
+                wrapped.replace(b'\x1b', b'\x1b\x1b'),
+                self.tmux_protocol_end,
+            )
+        return wrapped
+
+    def _write(self, msg, wrap=True):
+        # Print codes, wrapped into protocol if needed.
+        if wrap:
+            self.stdbout.write(self._wrap_byte_string(msg))
+        else:
+            self.stdbout.write(msg)
+
+    def _read(self, response=False):
+        # read response(s); DA1 response should always be last
+        resp = b''
+        if (response and not self.is_tmux) or ('VIM' in os.environ or 'NVIM' in os.environ):
+            # if we wait for init response and not in tmux
+            # or inside (n)vim terminal, then we look for 'c' response
+            end = self.response_end
+        else:
+            # otherwise we expect protocol_end
+            end = self.protocol_end
+        try:
+            while not resp.endswith(end):
+                resp += self.stdbin.read(1)
+        # Option to cancel loop in some weird cases
+        # like keyboard input getting into stdin and rewriting it
+        except KeyboardInterrupt:
+            resp = ""
+        return resp
+
+    def _late_init(self):
+        # Use Tmux escape sequence if appropriate.
+        if 'TMUX' in os.environ:
+            self._handle_init_tmux()
+
+        # query terminal for kitty graphics protocol support
+        # https://sw.kovidgoyal.net/kitty/graphics-protocol/#querying-support-and-available-transmission-mediums
+        # combined with automatic check if we share the filesystem using a dummy file
         with NamedTemporaryFile() as tmpf:
             tmpf.write(bytearray([0xFF] * 3))
             tmpf.flush()
+            # kitty graphics protocol query
             for cmd in self._format_cmd_str(
                     {'a': 'q', 'i': 1, 'f': 24, 't': 'f', 's': 1, 'v': 1, 'S': 3},
                     payload=base64.standard_b64encode(tmpf.name.encode(self.fsenc))):
-                self.stdbout.write(cmd)
+                self._write(cmd)
             sys.stdout.flush()
-            resp = b''
-            while resp[-2:] != self.protocol_end:
-                resp += self.stdbin.read(1)
+            # VT100 Primary Device Attributes (DA1) query
+            self.stdbout.write(b'\x1b[c')
+            sys.stdout.flush()
+            resp = self._read(response=True)
+
+        # check whether kitty graphics protocol query was acknowledged
+        # NOTE: this catches tmux too, no special case needed!
+        if self.protocol_start not in resp:
+            raise ImgDisplayUnsupportedException(
+                'terminal did not respond to kitty graphics query; disabling')
+        # strip resp down to just the kitty graphics protocol response
+        resp = resp[resp.find(self.protocol_start):resp.find(self.protocol_end) + 1]
+
         # set the transfer method based on the response
-        # if resp.find(b'OK') != -1:
         if b'OK' in resp:
             self.stream = False
             self.temp_file_dir = os.path.join(
@@ -764,7 +828,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             self.stream = True
         else:
             raise ImgDisplayUnsupportedException(
-                'kitty replied an unexpected response: {r}'.format(r=resp))
+                'unexpected response from terminal emulator: {r}'.format(r=resp))
 
         # get the image manipulation backend
         try:
@@ -773,7 +837,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             import PIL.Image
             self.backend = PIL.Image
         except ImportError:
-            raise ImageDisplayError("Image previews in kitty require PIL (pillow)")
+            raise ImageDisplayError("previews using kitty graphics require PIL (pillow)")
             # TODO: implement a wrapper class for Imagemagick process to
             # replicate the functionality we use from im
 
@@ -784,6 +848,27 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         self.pix_row, self.pix_col = x_px_tot // n_rows, y_px_tot // n_cols
         self.needs_late_init = False
 
+    def _handle_init_tmux(self):
+        # Check whether allow-passthrough is enabled
+        try:
+            tmux_allow_passthrough = check_output(
+                ['tmux', 'show-options', '-Apv', 'allow-passthrough']).strip()
+        except CalledProcessError:
+            tmux_allow_passthrough = b'off'
+        if tmux_allow_passthrough == b'off':
+            raise ImageDisplayError("allow-passthrough is not set in Tmux!")
+
+        # Load placeholder and diacritics for tmux
+        try:
+            from ranger.data.rowcolumn_diacritics import diacritics, KITTY_PLACEHOLDER
+            self.diacritics = diacritics
+            self.placeholder = KITTY_PLACEHOLDER
+        except Exception as err:
+            raise ImageDisplayError("Error while loading diacritics and placeholder: " + str(err))
+
+        self.is_tmux = True
+
+    # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
         self.image_id += 1
         # dictionary to store the command arguments for kitty
@@ -796,6 +881,9 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         # finish initialization if it is the first call
         if self.needs_late_init:
             self._late_init()
+        if self.is_tmux:
+            # U: 1=enable virtual placement using unicode placeholder
+            cmds.update({'U': 1})
 
         with warnings.catch_warnings(record=True):  # as warn:
             warnings.simplefilter('ignore', self.backend.DecompressionBombWarning)
@@ -809,7 +897,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         if image.width > box[0] or image.height > box[1]:
             scale = min(box[0] / image.width, box[1] / image.height)
             image = image.resize((int(scale * image.width), int(scale * image.height)),
-                                 self.backend.LANCZOS)
+                                 self.backend.LANCZOS)  # pylint: disable=no-member
 
         if image.mode not in ("RGB", "RGBA"):
             image = image.convert(
@@ -847,15 +935,15 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
 
         with temporarily_moved_cursor(int(start_y), int(start_x)):
             for cmd_str in self._format_cmd_str(cmds, payload=payload):
-                self.stdbout.write(cmd_str)
+                self._write(cmd_str)
+            if self.is_tmux:
+                self._print_placeholder(self.image_id, start_x, start_y, width, height)
         # catch kitty answer before the escape codes corrupt the console
-        resp = b''
-        while resp[-2:] != self.protocol_end:
-            resp += self.stdbin.read(1)
+        resp = self._read()
         if b'OK' in resp:
             return
         else:
-            raise ImageDisplayError('kitty replied "{r}"'.format(r=resp))
+            raise ImageDisplayError('kitty graphics protocol replied "{r}"'.format(r=resp))
 
     def clear(self, start_x, start_y, width, height):
         # let's assume that every time ranger call this
@@ -864,7 +952,7 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
         #       supports it
         cmds = {'a': 'd', 'i': self.image_id}
         for cmd_str in self._format_cmd_str(cmds):
-            self.stdbout.write(cmd_str)
+            self._write(cmd_str)
         self.stdbout.flush()
         # kitty doesn't seem to reply on deletes, checking like we do in draw()
         # will slows down scrolling with timeouts from select
@@ -880,14 +968,36 @@ class KittyImageDisplayer(ImageDisplayer, FileManagerAware):
             # appending the end (m=0) key to a single message has no effect
             while len(payload) > max_slice_len:
                 payload_blk, payload = payload[:max_slice_len], payload[max_slice_len:]
-                yield self.protocol_start + \
-                    central_blk + b',m=1;' + payload_blk + \
-                    self.protocol_end
-            yield self.protocol_start + \
-                central_blk + b',m=0;' + payload + \
-                self.protocol_end
+                yield b'%s%s%s' % (central_blk, b',m=1;', payload_blk)
+            yield b'%s%s%s' % (central_blk, b',m=0;', payload)
         else:
-            yield self.protocol_start + central_blk + b';' + self.protocol_end
+            yield b'%s%s' % (central_blk, b';')
+
+    # For more info about the kitty graphics protocol with unicode character as
+    # placeholders go to
+    # https://sw.kovidgoyal.net/kitty/graphics-protocol/#unicode-placeholders
+    #
+    # The image can be actually displayed by using the placeholder character,
+    # encoding the image ID in its foreground color. The row and column values
+    # are specified with diacritics listed in [rowcolumn-diacritics.txt]
+    def _print_placeholder(self, image_id, x, y, width, height):
+        # we encode the image ID in the foreground
+        foreground = "\x1b[38;2;{a};{b};{c}m".format(
+            a=(image_id >> 16) % 255, b=(image_id >> 8) % 255, c=image_id % 255)
+        restore = "\x1b[39m"
+
+        # fill the rectangle with the placeholder
+        self._write(foreground.encode(self.fsenc), wrap=False)
+        for i in range(height):
+            tparm = curses.tparm(curses.tigetstr("cup"), int(y + i), int(x))
+            self._write(tparm, wrap=False)
+            for j in range(width):
+                # we use the diacritics to specify the row and the column value
+                self._write(
+                    '{0}{1}{2}'
+                    .format(self.placeholder, self.diacritics[i], self.diacritics[j])
+                    .encode(self.fsenc), wrap=False)
+        self._write(restore.encode(self.fsenc), wrap=False)
 
     def quit(self):
         # clear all remaining images, then check if all files went through or
@@ -933,9 +1043,10 @@ class UeberzugImageDisplayer(ImageDisplayer):
 
     def _execute(self, **kwargs):
         self.initialize()
-        self.process.stdin.write(json.dumps(kwargs) + '\n')
+        self.process.stdin.write(json.dumps(kwargs, ensure_ascii=False) + '\n')
         self.process.stdin.flush()
 
+    # pylint: disable=too-many-positional-arguments
     def draw(self, path, start_x, start_y, width, height):
         self._execute(
             action='add',

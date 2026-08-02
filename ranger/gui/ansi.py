@@ -20,6 +20,9 @@ reset = '\x1b[0m'
 
 
 def split_ansi_from_text(ansi_text):
+    if isinstance(ansi_text, WideString):
+        ansi_text = ansi_text.string
+
     return ansi_re.split(ansi_text)
 
 # For information on the ANSI codes see
@@ -119,6 +122,10 @@ def char_len(ansi_text):
     >>> char_len("")
     0
     """
+
+    if isinstance(ansi_text, WideString):
+        ansi_text = ansi_text.string
+
     return len(WideString(ansi_re.sub('', ansi_text)))
 
 

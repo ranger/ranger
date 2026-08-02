@@ -9,7 +9,7 @@ import sys
 from shutil import (_samefile, rmtree, _basename, _destinsrc, Error, SpecialFileError)
 from ranger.ext.safe_path import get_safe_path
 
-__all__ = ["copyfileobj", "copyfile", "copystat", "copy2", "BLOCK_SIZE",
+__all__ = ["copyfileobj", "copyfileobj_range", "copyfile", "copystat", "copy2", "BLOCK_SIZE",
            "copytree", "move", "rmtree", "Error", "SpecialFileError"]
 
 BLOCK_SIZE = 16 * 1024
@@ -111,6 +111,28 @@ def copyfileobj(fsrc, fdst, length=BLOCK_SIZE):
         yield done
 
 
+try:
+    _copy = os.copy_file_range
+
+    def copyfileobj_range(fsrc, fdst, length=BLOCK_SIZE):
+        """copy data from fsrc to fdst with copy_file_range to enable CoW"""
+        src_fd = fsrc.fileno()
+        dst_fd = fdst.fileno()
+        done = 0
+        while 1:
+            # copy_file_range returns number of bytes read, or -1 if there was
+            # an error
+            read = _copy(src_fd, dst_fd, length)
+            if read == 0:
+                break
+            elif read == -1:
+                raise OSError
+            done += read
+            yield done
+except AttributeError:
+    pass
+
+
 def copyfile(src, dst):
     """Copy data from src to dst"""
     if _samefile(src, dst):
@@ -129,6 +151,16 @@ def copyfile(src, dst):
 
     with open(src, 'rb') as fsrc:
         with open(dst, 'wb') as fdst:
+            try:
+                for done in copyfileobj_range(fsrc, fdst):
+                    yield done
+                return
+            except OSError:
+                # Return to start of files first, then use old method
+                fsrc.seek(0, 0)
+                fdst.seek(0, 0)
+            except NameError:
+                pass  # Just fall back if there's no copy_file_range
             for done in copyfileobj(fsrc, fdst):
                 yield done
 
@@ -154,8 +186,16 @@ def copy2(src, dst, overwrite=False, symlinks=False, make_safe_path=get_safe_pat
         copystat(src, dst)
 
 
-def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches
-             symlinks=False, ignore=None, overwrite=False, make_safe_path=get_safe_path):
+def copytree(
+    # pylint: disable=too-many-locals,too-many-branches
+    # pylint: disable=too-many-positional-arguments
+    src,
+    dst,
+    symlinks=False,
+    ignore=None,
+    overwrite=False,
+    make_safe_path=get_safe_path,
+):
     """Recursively copy a directory tree using copy2().
 
     The destination directory must not already exist.
@@ -209,8 +249,14 @@ def copytree(src, dst,  # pylint: disable=too-many-locals,too-many-branches
                 copystat(srcname, dstname)
             elif os.path.isdir(srcname):
                 n = 0
-                for n in copytree(srcname, dstname, symlinks, ignore, overwrite,
-                                  make_safe_path):
+                for n in copytree(
+                    srcname,
+                    dstname,
+                    symlinks=symlinks,
+                    ignore=ignore,
+                    overwrite=overwrite,
+                    make_safe_path=make_safe_path,
+                ):
                     yield done + n
                 done += n
             else:
@@ -253,10 +299,11 @@ def move(src, dst, overwrite=False, make_safe_path=get_safe_path):
     """
     real_dst = dst
     if os.path.isdir(dst):
-        if _samefile(src, dst):
+        if _samefile(src, dst) and not os.path.islink(src):
             # We might be on a case insensitive filesystem,
             # perform the rename anyway.
             os.rename(src, dst)
+            yield 0
             return
 
         real_dst = os.path.join(dst, _basename(src))
@@ -264,8 +311,9 @@ def move(src, dst, overwrite=False, make_safe_path=get_safe_path):
         real_dst = make_safe_path(real_dst)
     try:
         os.rename(src, real_dst)
+        yield 0
     except OSError:
-        if os.path.isdir(src):
+        if os.path.isdir(src) and not os.path.islink(src):
             if _destinsrc(src, dst):
                 raise Error("Cannot move a directory '%s' into itself '%s'." % (src, dst))
             for done in copytree(src, real_dst, symlinks=True, overwrite=overwrite,

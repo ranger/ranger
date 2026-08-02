@@ -11,6 +11,7 @@ import os.path
 import shutil
 import sys
 import tempfile
+import urllib
 from io import open
 from logging import getLogger
 
@@ -250,14 +251,19 @@ https://github.com/ranger/ranger/issues
         # print the exit message if any
         if exit_msg:
             sys.stderr.write(exit_msg)
-        return exit_code  # pylint: disable=lost-exception
+
+    return exit_code  # pylint: disable=lost-exception
 
 
 def get_paths(args):
     if args.paths:
         prefix = 'file://'
-        prefix_length = len(prefix)
-        paths = [path[prefix_length:] if path.startswith(prefix) else path for path in args.paths]
+        paths = []
+        for path in args.paths:
+            if path.startswith(prefix):
+                paths.append(urllib.parse.unquote(urllib.parse.urlparse(path).path))
+            else:
+                paths.append(path)
     else:
         start_directory = os.environ.get('PWD')
         is_valid_start_directory = start_directory and os.path.exists(start_directory)

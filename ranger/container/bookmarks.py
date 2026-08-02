@@ -9,6 +9,7 @@ import os
 from io import open
 
 from ranger import PY3
+from ranger.container import fsobject
 from ranger.core.shared import FileManagerAware
 
 ALLOWED_KEYS = string.ascii_letters + string.digits + "`'"
@@ -182,6 +183,8 @@ class Bookmarks(FileManagerAware):
                 for key, value in self.dct.items():
                     if key in ALLOWED_KEYS \
                             and key not in self.nonpersistent_bookmarks:
+                        if isinstance(value, fsobject.FileSystemObject):
+                            value = value.original_path
                         key_value = "{0}:{1}\n".format(key, value)
                         if not PY3 and isinstance(key_value, str):
                             key_value = key_value.decode("utf-8")

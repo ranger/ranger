@@ -1,4 +1,4 @@
-name: Pylint, PEP8 and Pytest
+name: Python linting and tests
 
 on:
   push:
@@ -8,16 +8,18 @@ on:
       - 'requirements.txt'
 
 jobs:
-  test_pylint:
+  test_py:
+    env:
+      TERM: xterm
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
       matrix:
         python-version: [3.x]
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
@@ -26,4 +28,4 @@ jobs:
         pip install -r requirements.txt
     - name: Lint with Flake8 and Pylint, test with Pytest
       run: |
-        make test_flake8 test_pylint test_pytest
+        make test_py

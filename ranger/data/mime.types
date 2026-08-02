@@ -31,10 +31,18 @@ image/webp              webp
 
 message/rfc822          eml
 
+text/plain              hs lhs nim rs ts tsx
 text/x-ruby             rb
+text/x-shellscript      sh
 
 video/ogg               ogv ogm
 video/webm              webm
 video/x-flv             flv
 video/x-matroska        mkv
 video/x-msvideo         divx
+
+application/x-openscad  scad
+model/stl               stl
+model/step              p21 stp step stpnc 210
+model/iges              iges
+model/3mf               3mf

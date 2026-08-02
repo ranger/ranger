@@ -89,6 +89,8 @@
 # of ranger.
 # ===================================================================
 
+# pylint: disable=invalid-name,too-many-lines
+
 from __future__ import (absolute_import, division, print_function)
 
 from collections import deque
@@ -822,7 +824,11 @@ class trash(Command):
             file_names = [f.relative_path for f in files]
             many_files = (cwd.marked_items or is_directory_with_files(tfile.path))
 
-        confirm = self.fm.settings.confirm_on_delete
+        confirm = self.fm.settings.confirm_on_trash
+
+        if confirm == 'like_delete':
+            confirm = self.fm.settings.confirm_on_delete
+
         if confirm != 'never' and (confirm != 'multiple' or many_files):
             self.fm.ui.console.ask(
                 "Confirm deletion of: %s (y/N)" % ', '.join(file_names),
@@ -1222,7 +1228,7 @@ class chmod(Command):
 
 
 class bulkrename(Command):
-    """:bulkrename
+    """:bulkrename [-FLAGS...]
 
     This command opens a list of selected files in an external editor.
     After you edit and save the file, it will generate a shell script
@@ -1739,13 +1745,22 @@ class narrow(Command):
 
     Show only the files selected right now. If no files are selected,
     disable narrowing.
+
+    To disable narrow mode when selection is still active, use the
+    :unnarrow command.
     """
+
     def execute(self):
-        if self.fm.thisdir.marked_items:
+        # Calling :narrow enables narrow mode unless it is called with a
+        # case-insensitive `false` argument
+        narrow_mode = self.arg(1).lower() != "false"
+
+        if narrow_mode and self.fm.thisdir.marked_items:
             selection = [f.basename for f in self.fm.thistab.get_selection()]
             self.fm.thisdir.narrow_filter = selection
         else:
             self.fm.thisdir.narrow_filter = None
+
         self.fm.thisdir.refilter()
 
 
@@ -1826,7 +1841,11 @@ class filter_stack(Command):
 
     def quick(self):
         if self.rest(1).startswith("add name "):
-            self.fm.thisdir.temporary_filter = re.compile(self.rest(3))
+            try:
+                regex = re.compile(self.rest(3))
+            except re.error:
+                regex = re.compile("")
+            self.fm.thisdir.temporary_filter = regex
             self.fm.thisdir.refilter()
 
         return False

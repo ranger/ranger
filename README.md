@@ -1,14 +1,17 @@
-ranger 1.9.3
-============
-
-<img src="https://ranger.github.io/ranger_logo.png" width="150">
-
-[![Build Status](https://travis-ci.org/ranger/ranger.svg?branch=master)](https://travis-ci.org/ranger/ranger)
-<a href="https://repology.org/metapackage/ranger/versions">
-  <img src="https://repology.org/badge/latest-versions/ranger.svg" alt="latest packaged version(s)">
+<div align="center">
+<a href="https://ranger.fm/">
+<img src="https://ranger.fm/ranger_logo.png" width="200">
 </a>
 
-ranger is a console file manager with VI key bindings.  It provides a
+Ranger 1.9.4
+============
+
+[![Python lints and tests](https://github.com/ranger/ranger/actions/workflows/python.yml/badge.svg)](https://github.com/ranger/ranger/actions/workflows/python.yml)
+<a href="https://repology.org/metapackage/ranger/versions"><img src="https://repology.org/badge/latest-versions/ranger.svg" alt="latest packaged version(s)"></a>
+[![Donate via Liberapay](https://img.shields.io/liberapay/patrons/ranger)](https://liberapay.com/ranger)
+</div>
+
+Ranger is a console file manager with VI key bindings.  It provides a
 minimalistic and nice curses interface with a view on the directory hierarchy.
 It ships with `rifle`, a file launcher that is good at automatically finding
 out which program to use for what file type.
@@ -42,8 +45,8 @@ About
 -----
 * Authors:     see `AUTHORS` file
 * License:     GNU General Public License Version 3
-* Website:     https://ranger.github.io/
-* Download:    https://ranger.github.io/ranger-stable.tar.gz
+* Website:     https://ranger.fm/
+* Download:    https://ranger.fm/ranger-stable.tar.gz
 * Bug reports: https://github.com/ranger/ranger/issues
 * git clone    https://github.com/ranger/ranger.git
 
@@ -88,13 +91,13 @@ For general usage:
 For enhanced file previews (with `scope.sh`):
 
 * `img2txt` (from `caca-utils`) for ASCII-art image previews
-* `w3mimgdisplay`, `ueberzug`, `mpv`, `iTerm2`, `kitty`, `terminology` or `urxvt` for image previews
+* `w3mimgdisplay`, `ueberzug`, `mpv`, `iTerm2`, `kitty` (or other terminal supporting the Kitty graphics protocol), `terminology` or `urxvt` for image previews
 * `convert` (from `imagemagick`) to auto-rotate images and for image previews
 * `rsvg-convert` (from [`librsvg`](https://wiki.gnome.org/Projects/LibRsvg))
   for SVG previews
 * `ffmpeg`, or `ffmpegthumbnailer` for video thumbnails
 * `highlight`, `bat` or `pygmentize` for syntax highlighting of code
-* `atool`, `bsdtar`, `unrar` and/or `7z` to preview archives
+* `atool`, `bsdtar`, `unrar` and/or `7zz` to preview archives
 * `bsdtar`, `tar`, `unrar`, `unzip` and/or `zipinfo` (and `sed`) to preview
   archives as their first image
 * `lynx`, `w3m` or `elinks` to preview html pages

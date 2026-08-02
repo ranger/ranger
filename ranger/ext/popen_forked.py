@@ -27,5 +27,5 @@ def Popen_forked(*args, **kwargs):  # pylint: disable=invalid-name
             Popen(*args, **kwargs)  # pylint: disable=consider-using-with
         os._exit(0)  # pylint: disable=protected-access
     else:
-        os.wait()
+        os.waitpid(pid, 0)
     return True

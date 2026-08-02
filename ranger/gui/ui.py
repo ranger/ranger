@@ -128,8 +128,9 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
             self.is_set_up = True
             self.setup()
             self.win.addstr("loading...")
-            self.win.refresh()
             self._draw_title = curses.tigetflag('hs')  # has_status_line
+
+        self.win.refresh()
 
         self.update_size()
         self.is_on = True
@@ -151,10 +152,6 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.win.keypad(0)
         curses.nocbreak()
         curses.echo()
-        try:
-            curses.curs_set(1)
-        except curses.error:
-            pass
         if self.settings.mouse_enabled:
             _setup_mouse({"value": False})
         curses.endwin()
@@ -369,15 +366,18 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
         self.win.touchwin()
         DisplayableContainer.draw(self)
         if self._draw_title and self.settings.update_title:
-            cwd = self.fm.thisdir.path
-            if self.settings.tilde_in_titlebar \
-               and (cwd == self.fm.home_path
-                    or cwd.startswith(self.fm.home_path + "/")):
-                cwd = '~' + cwd[len(self.fm.home_path):]
-            if self.settings.shorten_title:
-                split = cwd.rsplit(os.sep, self.settings.shorten_title)
-                if os.sep in split[0]:
-                    cwd = os.sep.join(split[1:])
+            if self.fm.thisdir:
+                cwd = self.fm.thisdir.path
+                if self.settings.tilde_in_titlebar \
+                   and (cwd == self.fm.home_path
+                        or cwd.startswith(self.fm.home_path + "/")):
+                    cwd = '~' + cwd[len(self.fm.home_path):]
+                if self.settings.shorten_title:
+                    split = cwd.rsplit(os.sep, self.settings.shorten_title)
+                    if os.sep in split[0]:
+                        cwd = os.sep.join(split[1:])
+            else:
+                cwd = "not accessible"
             try:
                 fixed_cwd = cwd.encode('utf-8', 'surrogateescape'). \
                     decode('utf-8', 'replace')
