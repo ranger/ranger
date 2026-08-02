@@ -1261,7 +1261,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             if path:
                 tab.enter_dir(path, history=True)
             else:
-                if os.path.isdir(tab.path):
+                if os.path.exists(tab.path):
                     tab.enter_dir(tab.path, history=False)
                 else:
                     tab.thisdir = None
