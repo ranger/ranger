@@ -444,49 +444,53 @@ def load_settings(  # pylint: disable=too-many-locals,too-many-branches,too-many
         load_custom_commands(system_comm_path, custom_comm_path)
 
         # XXX Load plugins (experimental)
-        plugindir = fm.confpath('plugins')
-        try:
-            plugin_files = os.listdir(plugindir)
-        except OSError:
-            LOG.debug('Unable to access plugin directory: %s', plugindir)
-        else:
-            plugins = []
-            for path in plugin_files:
-                if not path.startswith('_'):
-                    if path.endswith('.py'):
-                        # remove trailing '.py'
-                        plugins.append(path[:-3])
-                    elif os.path.isdir(os.path.join(plugindir, path)):
-                        plugins.append(path)
+        def try_load_plugins_from(plugindir):
+            try:
+                plugin_files = os.listdir(plugindir)
+            except OSError:
+                LOG.debug('Unable to access plugin directory: %s', plugindir)
+            else:
+                plugins = []
+                for path in plugin_files:
+                    if not path.startswith('_'):
+                        if path.endswith('.py'):
+                            # remove trailing '.py'
+                            plugins.append(path[:-3])
+                        elif os.path.isdir(os.path.join(plugindir, path)):
+                            plugins.append(path)
 
+                ranger.fm = fm
+                for plugin in sorted(plugins):
+                    try:
+                        try:
+                            # importlib does not exist before python2.7.  It's
+                            # required for loading commands from plugins, so you
+                            # can't use that feature in python2.6.
+                            import importlib
+                        except ImportError:
+                            module = __import__('plugins', fromlist=[plugin])
+                        else:
+                            module = importlib.import_module('plugins.' + plugin)
+                            fm.commands.load_commands_from_module(module)
+                        LOG.debug("Loaded plugin '%s'", plugin)
+                    except Exception as ex:  # pylint: disable=broad-except
+                        ex_msg = "Error while loading plugin '{0}'".format(plugin)
+                        LOG.error(ex_msg)
+                        LOG.exception(ex)
+                        fm.notify(ex_msg, bad=True)
+                ranger.fm = None
+
+        if os.path.exists(fm.confpath('plugins')):
             if not os.path.exists(fm.confpath('plugins', '__init__.py')):
-                LOG.debug("Creating missing '__init__.py' file in plugin folder")
+                LOG.debug("Creating missing '__init__.py' file in user plugin folder")
                 with open(
                     fm.confpath('plugins', '__init__.py'), 'w', encoding="utf-8"
                 ):
                     # Create the file if it doesn't exist.
                     pass
 
-            ranger.fm = fm
-            for plugin in sorted(plugins):
-                try:
-                    try:
-                        # importlib does not exist before python2.7.  It's
-                        # required for loading commands from plugins, so you
-                        # can't use that feature in python2.6.
-                        import importlib
-                    except ImportError:
-                        module = __import__('plugins', fromlist=[plugin])
-                    else:
-                        module = importlib.import_module('plugins.' + plugin)
-                        fm.commands.load_commands_from_module(module)
-                    LOG.debug("Loaded plugin '%s'", plugin)
-                except Exception as ex:  # pylint: disable=broad-except
-                    ex_msg = "Error while loading plugin '{0}'".format(plugin)
-                    LOG.error(ex_msg)
-                    LOG.exception(ex)
-                    fm.notify(ex_msg, bad=True)
-            ranger.fm = None
+        try_load_plugins_from(os.path.join(system_confdir, 'plugins'))
+        try_load_plugins_from(fm.confpath('plugins'))
 
         allow_access_to_confdir(ranger.args.confdir, False)
         # Load rc.conf
