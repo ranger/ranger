@@ -943,7 +943,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
     def hide_bookmarks(self):
         self.ui.browser.draw_bookmarks = False
 
-    def draw_possible_programs(self):
+    def draw_possible_programs(self):  # pylint: disable=too-many-locals
         try:
             target = self.thistab.get_selection()[0]
         except IndexError:
@@ -955,7 +955,39 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
             num_digits = max((len(str(program[0])) for program in programs))
             program_info = ['%s | %s' % (str(program[0]).rjust(num_digits), program[1])
                             for program in programs]
-            self.ui.browser.draw_info = program_info
+#           self.ui.browser.draw_info = program_info
+
+            import subprocess
+            win_hei = self.ui.browser.hei + 2
+            win_wid = self.ui.browser.wid
+            fzf_menu_hei = min(win_hei, len(programs) + 3)
+
+            self.ui.win.move(win_hei - fzf_menu_hei, 0)
+            self.ui.win.refresh()
+
+            label = ' open %s with '
+            label_pos = 3
+            path_str = target.relative_path
+            max_len = win_wid - (len(label) + label_pos)
+            if len(path_str) > max_len:
+                path_str = path_str[:max_len - 1] \
+                    + self.ui.browser.ellipsis[self.settings.unicode_ellipsis]
+
+            # pylint: disable=consider-using-with
+            process = subprocess.Popen(['fzf', '--accept-nth=1', '--height=%d' % fzf_menu_hei,
+                                        '--reverse', '--no-info', '--no-sort', '--no-separator',
+                                        '--exact', '--bind', 'home:first', '--bind', 'end:last',
+                                        '--border', '--border-label-pos=%d' % label_pos,
+                                        '--border-label', label % path_str],
+                                       text=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+            stdout, _ = process.communicate(input='\n'.join(program_info))
+
+            # reset terminal cursor & mouse settings and redraw window
+            self.ui.suspend()
+            self.ui.initialize()
+
+            if stdout:
+                self.fm.execute_console('open_with %s' % stdout.strip())
 
     def hide_console_info(self):
         self.ui.browser.draw_info = False
