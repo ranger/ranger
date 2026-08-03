@@ -53,7 +53,8 @@ def special_keys_init():
     for key, val in tuple(special_keys.items()):
         special_keys['a-' + key] = (ALT_KEY, val)
 
-    for char in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_!{}':
+    for char in ('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' +
+                 '0123456789)(*&^%$#@!=-`[]\\;\',./~_+{}|:"?'):
         special_keys['a-' + char] = (ALT_KEY, ord(char))
 
     for char in 'abcdefghijklmnopqrstuvwxyz_':
