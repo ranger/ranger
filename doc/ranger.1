@@ -742,6 +742,9 @@ Apply a new mimetype filter.
 .IP .n 14
 .IX Item ".n"
 Apply a new filename filter.
+.IP .s 14
+.IX Item ".s"
+Apply a new size filter.
 .IP .# 14
 Apply a new hash filter.
 .IP ".""" 14
@@ -1437,6 +1440,24 @@ Filter files so only files with the same hash as PATH are shown.
 .IP "mimetype TYPE" 2
 .IX Item "mimetype TYPE"
 Filter files of a certain MIME type, regular expression syntax is allowed.
+.IP "size SIZE" 2
+.IX Item "size SIZE"
+Filter files by size, given in Bytes with (case insensitive) suffix [k|m|g] and
+an optional comparison operator:
+.Sp
+.Vb 3
+\& [+|>]  larger than
+\& [\-|<]  smaller than
+\& [=|]   equal to
+.Ve
+.Sp
+Examples:
+.Sp
+.Vb 3
+\& +20k   bigger 20 KiByte
+\& <1M    less than 1 MiByte
+\& =2G    exactly 2 GiByte
+.Ve
 .IP "typefilter [d|f|l]" 2
 .IX Item "typefilter [d|f|l]"
 Filter files of a certain type, \f(CW\*(C`d\*(C'\fR for directories, \f(CW\*(C`f\*(C'\fR for files and \f(CW\*(C`l\*(C'\fR

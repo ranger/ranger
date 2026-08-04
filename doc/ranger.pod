@@ -828,6 +828,10 @@ Apply a new mimetype filter.
 
 Apply a new filename filter.
 
+=item .s
+
+Apply a new size filter.
+
 =item .#
 
 Apply a new hash filter.
@@ -1643,6 +1647,21 @@ Filter files so only files with the same hash as PATH are shown.
 =item mimetype TYPE
 
 Filter files of a certain MIME type, regular expression syntax is allowed.
+
+=item size SIZE
+
+Filter files by size, given in Bytes with (case insensitive) suffix [k|m|g] and
+an optional comparison operator:
+
+ [+|>]  larger than
+ [-|<]  smaller than
+ [=|]   equal to
+
+Examples:
+
+ +20k   bigger 20 KiByte
+ <1M    less than 1 MiByte
+ =2G    exactly 2 GiByte
 
 =item typefilter [d|f|l]
 
