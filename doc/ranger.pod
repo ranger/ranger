@@ -828,6 +828,10 @@ Apply a new mimetype filter.
 
 Apply a new filename filter.
 
+=item .C
+
+Apply a new shell command filter.
+
 =item .#
 
 Apply a new hash filter.
@@ -1643,6 +1647,19 @@ Filter files so only files with the same hash as PATH are shown.
 =item mimetype TYPE
 
 Filter files of a certain MIME type, regular expression syntax is allowed.
+
+=item command COMMAND
+
+Filter files by given shell command (no safety checks!). Only supports simple
+shell commands invoked with the path of each of the files being filtered. The
+filter matches files for which the command returns an exit status of 0. This is
+useful with grep, f.e.
+
+  :filter_stack add command grep -I STRING
+
+to show all non-binary (-I) files that match the given string. There's a
+timeout of 10 seconds per call to prevent hanging, so avoid commands with long
+run-times.
 
 =item typefilter [d|f|l]
 
