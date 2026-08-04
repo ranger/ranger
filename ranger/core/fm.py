@@ -108,6 +108,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         self.rifle = None
         self.thistab = None
         self.zombies = ProcessSet()
+        self._already_saved_tabs_on_exit = False
 
         try:
             self.username = pwd.getpwuid(os.geteuid()).pw_name
@@ -233,6 +234,20 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
 
         signal.signal(signal.SIGTSTP, sigtstp_handler)
 
+        def sigterm_handler(signum, frame):
+            # pylint: disable=unused-argument
+            self.save_tabs_on_exit()
+            sys.exit(0)
+
+        signal.signal(signal.SIGTERM, sigterm_handler)
+
+        def sighup_handler(signum, frame):
+            # pylint: disable=unused-argument
+            self.save_tabs_on_exit()
+            sys.exit(0)
+
+        signal.signal(signal.SIGHUP, sighup_handler)
+
         self.rifle.hook_logger = self.notify
         old_preprocessing_hook = self.rifle.hook_command_preprocessing
 
@@ -311,6 +326,16 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             except Exception:  # pylint: disable=broad-except
                 if debug:
                     raise
+
+    def save_tabs_on_exit(self):
+        if self._already_saved_tabs_on_exit:
+            return
+        if not ranger.args.clean and self.settings.save_tabs_on_exit and len(self.tabs) > 1:
+            with open(self.datapath('tabs'), 'a', encoding="utf-8") as fobj:
+                # Don't save active tab since launching ranger changes the active tab
+                fobj.write('\0'.join(v.path for t, v in self.tabs.items())
+                           + '\0\0')
+        self._already_saved_tabs_on_exit = True
 
     @staticmethod
     def get_log():
@@ -545,8 +570,4 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             self.bookmarks.save()
 
             # Save tabs
-            if not ranger.args.clean and self.settings.save_tabs_on_exit and len(self.tabs) > 1:
-                with open(self.datapath('tabs'), 'a', encoding="utf-8") as fobj:
-                    # Don't save active tab since launching ranger changes the active tab
-                    fobj.write('\0'.join(v.path for t, v in self.tabs.items())
-                               + '\0\0')
+            self.save_tabs_on_exit()
