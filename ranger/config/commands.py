@@ -851,6 +851,7 @@ class trash(Command):
         Executes the fm.execute_file method but catches the OSError ("Argument list too long")
         that occurs when moving too many files to trash (and would otherwise crash ranger).
         """
+
         try:
             self.fm.execute_file(files, label='trash')
         except OSError as err:
