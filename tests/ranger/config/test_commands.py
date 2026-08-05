@@ -10,7 +10,7 @@ import pytest
 from ranger.config.commands import bulkrename
 
 
-class _File(object):
+class _File(object):  # pylint: disable=too-few-public-methods
 
     def __init__(self, path):
         self.path = path
@@ -73,7 +73,7 @@ def reopenable_tempfiles(monkeypatch):
 
     def named_temporary_file(*args, **kwargs):
         kwargs["delete"] = False
-        fobj = original(*args, **kwargs)
+        fobj = original(*args, **kwargs)  # pylint: disable=consider-using-with
         paths.append(fobj.name)
         return fobj
 
@@ -85,7 +85,8 @@ def reopenable_tempfiles(monkeypatch):
             os.unlink(path)
 
 
-def test_bulkrename_unchanged_script_retags_files(tmpdir, reopenable_tempfiles):
+@pytest.mark.usefixtures("reopenable_tempfiles")
+def test_bulkrename_unchanged_script_retags_files(tmpdir):
     fm = _FM(str(tmpdir))
     command = bulkrename("bulkrename")
     command.fm = fm
@@ -97,8 +98,8 @@ def test_bulkrename_unchanged_script_retags_files(tmpdir, reopenable_tempfiles):
     assert not fm.notifications
 
 
-def test_bulkrename_edited_script_notifies_without_retagging(
-        tmpdir, reopenable_tempfiles):
+@pytest.mark.usefixtures("reopenable_tempfiles")
+def test_bulkrename_edited_script_notifies_without_retagging(tmpdir):
     fm = _FM(str(tmpdir), edit_script=True)
     command = bulkrename("bulkrename")
     command.fm = fm
