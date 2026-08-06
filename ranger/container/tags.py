@@ -96,7 +96,7 @@ class Tags(FileManagerAware):
         for path, tag in self.tags.items():
             if tag == self.default_tag:
                 # COMPAT: keep the old format if the default tag is used
-                fobj.write(path + '\n')
+                fobj.write(path.decode('utf-8', 'ignore') + '\n')
             elif tag in ALLOWED_KEYS:
                 fobj.write('{0}:{1}\n'.format(tag, path))
 
