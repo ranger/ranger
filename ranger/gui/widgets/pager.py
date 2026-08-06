@@ -7,6 +7,7 @@ from __future__ import (absolute_import, division, print_function)
 
 import curses
 import logging
+import warnings
 
 from ranger.gui import ansi
 from ranger.ext.direction import Direction
@@ -115,8 +116,14 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
             self.source = None
             self.need_redraw_image = False
             try:
-                self.fm.image_displayer.draw(self.image, self.x, self.y,
-                                             self.wid, self.hei)
+                with warnings.catch_warnings(record=True) as image_displayer_warnings:
+                    self.fm.image_displayer.draw(self.image, self.x, self.y,
+                                                 self.wid, self.hei)
+                if image_displayer_warnings:
+                    for warning in image_displayer_warnings:
+                        LOG.warning(warning.message)
+                    self.fm.notify('See image displaying warnings in ranger\'s log')
+
             except ImgDisplayUnsupportedException as ex:
                 self.fm.settings.preview_images = False
                 self.fm.notify(ex, bad=True)
