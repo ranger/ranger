@@ -55,6 +55,7 @@ ALLOWED_SETTINGS = {
     'idle_delay': int,
     'iterm2_font_width': int,
     'iterm2_font_height': int,
+    'iterm2_multipart_file_chunk_size': int,
     'line_numbers': str,
     'max_console_history_size': (int, type(None)),
     'max_history_size': (int, type(None)),
