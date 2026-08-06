@@ -295,11 +295,30 @@ class chain(Command):
     """
     resolve_macros = False
 
+    def _split(self, text):
+        result = []
+        token = ''
+        state = 0
+        for c in text:
+            if state == 0:
+                if c == '\\':
+                    state = 1
+                elif c == ';':
+                    result.append(token)
+                    token = ''
+                else:
+                    token += c
+            elif state == 1:
+                token += c
+                state = 0
+        result.append(token)
+        return result
+
     def execute(self):
         if not self.rest(1).strip():
             self.fm.notify('Syntax: chain <command1>; <command2>; ...', bad=True)
             return
-        for command in [s.strip() for s in self.rest(1).split(";")]:
+        for command in [s.strip() for s in self._split(self.rest(1))]:
             self.fm.execute_console(command)
 
 
