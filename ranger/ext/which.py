@@ -4,7 +4,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 import shutil
-from subprocess import check_output, CalledProcessError
+from ranger.ext.spawn import check_output, CalledProcessError
 from ranger import PY3
 
 
