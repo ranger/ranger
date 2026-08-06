@@ -185,7 +185,26 @@ handle_image() {
         #       "${IMAGE_CACHE_PATH}" && exit 6;;
 
         ## PDF
-        # application/pdf)
+        application/pdf)
+            if [[ "$(uname)" = "Darwin" ]]; then
+                ## Use mac built-in quicklook to preview pdf
+                ## rename extension from .png to .jpg provided by IMAGE_CACHE_PATH
+                ## image viewer can determine the actual format
+                qlmanage -t -s "${DEFAULT_SIZE%x*}" \
+                         -o "${IMAGE_CACHE_PATH%/*}" \
+                         ${FILE_PATH} \
+                         && mv "${IMAGE_CACHE_PATH%/*}/${FILE_PATH##*/}.png" "${IMAGE_CACHE_PATH}" \
+                         && exit 6 || exit 1
+            fi
+            exit 1;;
+            #if [[ "$(uname)" = "Darwin" ]]; then
+            #    echo 'Previewing in Mac Quicklook'
+            #    cat /tmp/rangerql.pid | xargs kill -9 > /dev/null 2>&1
+            #    nohup qlmanage -p ${FILE_PATH} > /dev/null 2>&1  &
+            #    rm /tmp/rangerql.pid
+            #    echo $! > "/tmp/rangerql.pid" && exit 5
+            #fi
+            #exit 1;;
         #     pdftoppm -f 1 -l 1 \
         #              -scale-to-x "${DEFAULT_SIZE%x*}" \
         #              -scale-to-y -1 \
