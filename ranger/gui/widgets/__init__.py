@@ -3,6 +3,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 from ranger.gui.displayable import Displayable
+from ranger.ext.widestring import normalize
 
 
 class Widget(Displayable):
@@ -44,4 +45,4 @@ class Widget(Displayable):
             '!', ['vcsunknown']),
     }
 
-    ellipsis = {False: '~', True: '…'}
+    ellipsis = {False: '~', True: normalize('…')}

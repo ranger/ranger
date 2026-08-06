@@ -10,7 +10,7 @@ import stat
 from time import time
 from os.path import splitext
 
-from ranger.ext.widestring import WideString
+from ranger.ext.widestring import normalize, WideString
 from ranger.core import linemode
 
 from ranger.gui import ansi
@@ -461,9 +461,9 @@ class BrowserColumn(Pager):  # pylint: disable=too-many-instance-attributes
 
     def _draw_text_display(self, text, space):
         bidi_text = self.bidi_transpose(text)
-        wtext = WideString(bidi_text)
-        wext = WideString(splitext(bidi_text)[1])
-        wellip = WideString(self.ellipsis[self.settings.unicode_ellipsis])
+        wtext = WideString(normalize(bidi_text))
+        wext = WideString(normalize(splitext(bidi_text)[1]))
+        wellip = WideString(normalize(self.ellipsis[self.settings.unicode_ellipsis]))
         wtext_len = ansi.char_len(wtext)
         wext_len = ansi.char_len(wext)
         wellip_len = ansi.char_len(wellip)

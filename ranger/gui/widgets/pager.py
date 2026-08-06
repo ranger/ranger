@@ -11,6 +11,7 @@ import logging
 from ranger.gui import ansi
 from ranger.ext.direction import Direction
 from ranger.ext.img_display import ImgDisplayUnsupportedException
+from ranger.ext.widestring import normalize
 
 from . import Widget
 
@@ -125,7 +126,8 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
             else:
                 self.image_drawn = True
 
-    def _draw_line(self, i, line):
+    def _draw_line(self, i, rawline):
+        line = normalize(rawline)
         if self.markup is None:
             self.addstr(i, 0, line)
         elif self.markup == 'ansi':
