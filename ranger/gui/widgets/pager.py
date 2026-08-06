@@ -246,9 +246,10 @@ class Pager(Widget):  # pylint: disable=too-many-instance-attributes
         while True:
             try:
                 line = self._get_line(i).expandtabs(4)
+                line_len = ansi.char_len(line)
                 for part in ((0,) if not
                              self.fm.settings.wrap_plaintext_previews else
-                             range(max(1, ((len(line) - 1) // self.wid) + 1))):
+                             range(max(1, ((line_len - 1) // self.wid) + 1))):
                     shift = part * self.wid
                     if self.markup == 'ansi':
                         line_bit = (ansi.char_slice(line, startx + shift,
