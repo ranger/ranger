@@ -393,8 +393,9 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                                  "  you can set the environment variable "
                                  "\033[1mRANGER_LOAD_DEFAULT_RC\033[0m to "
                                  "\033[1mFALSE\033[0m.\n"
-                                 "  Note that this requires providing sensible "
-                                 "values for all settings.\n")
+                                 "  WARNING: this will give you more maintenance work in the"
+                                 "long run,\n"
+                                 "  like setting values for all new settings in the future.\n")
         else:
             sys.stderr.write("Unknown config file `%s'\n" % which)
 
