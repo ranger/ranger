@@ -510,7 +510,7 @@ class UI(  # pylint: disable=too-many-instance-attributes,too-many-public-method
                     # gives out a warning if $TERM is not "screen"
                     self._multiplexer_title = check_output(
                         ['screen', '-Q', 'title']).strip()
-            except CalledProcessError:
+            except (CalledProcessError, OSError):
                 self.fm.notify("Couldn't access previous multiplexer window"
                                " name, won't be able to restore.",
                                bad=False)
