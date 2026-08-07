@@ -28,6 +28,7 @@ class Default(ColorScheme):
             if context.empty or context.error:
                 bg = red
             if context.border:
+                attr |= dim
                 fg = default
             if context.media:
                 if context.image:
@@ -91,7 +92,8 @@ class Default(ColorScheme):
                     fg = magenta
 
             if context.inactive_pane:
-                fg = cyan
+                attr |= dim
+                fg = default
 
         elif context.in_titlebar:
             if context.hostname:
