@@ -6,7 +6,7 @@ from __future__ import (absolute_import, division, print_function)
 from os import listdir, environ, stat
 import platform
 import shlex
-from stat import S_IXOTH, S_IFREG
+from stat import S_IXOTH, S_IXUSR, S_IXGRP, S_IFREG
 
 from ranger.ext.iter_tools import unique
 
@@ -56,7 +56,8 @@ def get_executables_uncached(*paths):
                 filestat = stat(abspath)
             except OSError:
                 continue
-            if filestat.st_mode & (S_IXOTH | S_IFREG):
+            if filestat.st_mode & S_IFREG and \
+                    filestat.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH):
                 executables.add(item)
     return executables
 

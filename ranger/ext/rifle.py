@@ -50,7 +50,7 @@ except ImportError:
         else:
             paths = ['/usr/bin', '/bin']
 
-        from stat import S_IXOTH, S_IFREG
+        from stat import S_IXOTH, S_IXUSR, S_IXGRP, S_IFREG
         paths_seen = set()
         cached_executables = set()
         for path in paths:
@@ -67,7 +67,8 @@ except ImportError:
                     filestat = os.stat(abspath)
                 except OSError:
                     continue
-                if filestat.st_mode & (S_IXOTH | S_IFREG):
+                if filestat.st_mode & S_IFREG and \
+                        filestat.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH):
                     cached_executables.add(item)
         return cached_executables
 
@@ -420,6 +421,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         """
         command = None
         found_at_least_one = None
+        raw_action = None
 
         # Determine command
         for count, cmd, lbl, flgs in self.list_commands(files, mimetype):
@@ -427,6 +429,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 cmd = self.hook_command_preprocessing(cmd)
                 if cmd == ASK_COMMAND:
                     return ASK_COMMAND
+                raw_action = cmd
                 command = self._build_command(files, cmd, flags + flgs)
                 flags = self._app_flags
                 break
@@ -435,6 +438,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         else:
             if label and label in get_executables():
                 cmd = '%s "$@"' % label
+                raw_action = cmd
                 command = self._build_command(files, cmd, flags)
 
         # Execute command
@@ -455,7 +459,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
             self.hook_before_executing(command, self._mimetype, self._app_flags)
             try:
                 if 'r' in flags:
-                    prefix = ['sudo', '-E', 'su', 'root', '-mc']
+                    prefix = ['sudo', '/bin/sh', '-c']
                 else:
                     prefix = ['/bin/sh', '-c']
 
@@ -490,7 +494,7 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                                          "change fallbacks in rifle.conf.")
                         self._mimetype = 'ranger/x-terminal-emulator'
                         self.execute(
-                            files=[command.split(';')[1].split('--')[0].strip()]
+                            files=[raw_action.split('--')[0].strip()]
                             + files, flags='f',
                             mimetype='ranger/x-terminal-emulator')
                         return None
@@ -518,8 +522,9 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     if term in ['tilda', 'pantheon-terminal', 'terminology',
                                 'termite']:
 
-                        target = command.split(';')[0].split('--')[1].strip()
-                        app = command.split(';')[1].split('--')[0].strip()
+                        target = "' '".join(f.replace("'", "'\\''")
+                                            for f in files if "\x00" not in f)
+                        app = raw_action.split('--')[0].strip()
                         cmd = [os.environ['TERMCMD'], cmdflag, '%s %s'
                                % (app, target)]
                     elif term in ['guake']:
