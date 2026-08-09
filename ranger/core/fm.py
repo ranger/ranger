@@ -5,30 +5,72 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from time import time
-from collections import deque
 import mimetypes
 import os.path
+import os
 import pwd
+import signal
 import socket
 import stat
 import sys
+from collections import deque
+from io import open
+from subprocess import Popen
+from time import time
 
 import ranger.api
-from ranger.core.actions import Actions
-from ranger.core.tab import Tab
 from ranger.container import settings
-from ranger.container.tags import Tags, TagsDummy
-from ranger.gui.ui import UI
 from ranger.container.bookmarks import Bookmarks
-from ranger.core.runner import Runner
-from ranger.ext.img_display import get_image_displayer
-from ranger.core.metadata import MetadataManager
-from ranger.ext.rifle import Rifle
 from ranger.container.directory import Directory
-from ranger.ext.signals import SignalDispatcher
+from ranger.container.tags import Tags, TagsDummy
+from ranger.core.actions import Actions
 from ranger.core.loader import Loader
+from ranger.core.metadata import MetadataManager
+from ranger.core.runner import Runner
+from ranger.core.tab import Tab
 from ranger.ext import logutils
+from ranger.ext.img_display import get_image_displayer
+from ranger.ext.posix_signals import call_signal_handler, delay_signal
+from ranger.ext.rifle import Rifle
+from ranger.ext.signals import SignalDispatcher
+from ranger.gui.ui import UI
+
+
+class ProcessSet(object):
+
+    def __init__(self):
+        self.processes = set()
+        self.ui = set()
+
+    def add(self, process, toggle_ui=False):
+        self.processes.add(process)
+        if toggle_ui:
+            self.ui.add(process)
+
+    def remove(self, process):
+        self.processes.remove(process)
+        try:
+            self.ui.remove(process)
+        except KeyError:
+            pass
+
+    def spawn(self, *popen_args, **spawn_kws):
+        popen_kws = spawn_kws.copy()
+        toggle_ui = popen_kws.pop('toggle_ui', False)
+        process = None
+        # to avoid breaking the terminal, don't handle certain signals
+        # until the process is in the set
+        with delay_signal(signal.SIGTSTP, should_delay=toggle_ui):
+            # pylint: disable=consider-using-with
+            process = Popen(*popen_args, **popen_kws)
+            self.add(process, toggle_ui)
+        return process
+
+    def __iter__(self):
+        return iter(self.processes)
+
+    def __bool__(self):
+        return bool(self.processes)
 
 
 class FM(Actions,  # pylint: disable=too-many-instance-attributes
@@ -49,7 +91,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         SignalDispatcher.__init__(self)
         self.ui = ui if ui is not None else UI()
         self.start_paths = paths if paths is not None else ['.']
-        self.directories = dict()
+        self.directories = {}
         self.bookmarks = bookmarks
         self.current_tab = 1
         self.tabs = {}
@@ -65,6 +107,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         self.run = None
         self.rifle = None
         self.thistab = None
+        self.zombies = ProcessSet()
 
         try:
             self.username = pwd.getpwuid(os.geteuid()).pw_name
@@ -135,6 +178,61 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             self.ui.suspend() if 'f' not in flags else None
         self.rifle.hook_after_executing = lambda a, b, flags: \
             self.ui.initialize() if 'f' not in flags else None
+
+        self.rifle.hook_process_open = lambda *popen_args, **popen_kws: \
+            self.zombies.spawn(*popen_args, toggle_ui=True, **popen_kws)
+
+        old_process_exit_hook = self.rifle.hook_process_exit
+
+        def hook_process_exit(process, cmd):
+            self.zombies.remove(process)
+            return old_process_exit_hook(process, cmd)
+
+        self.rifle.hook_process_exit = hook_process_exit
+
+        # By default, Ncurses installs a signal handler for SIGTSTP
+        # (when you hit Ctrl-Z). It will, among other things, switch
+        # between the shell terminal mode and the curses terminal mode
+        # as necessary, when the process has to suspend or resume.
+        #
+        # But at the time we receive SIGTSTP, we may be executing
+        # a subprocess that will also modify the terminal mode
+        # in response to the SIGTSTP signal, at the same time as FM.
+        # This can lead to a race condition where both FM and the
+        # subprocess(es) concurrently modify the terminal mode,
+        # resulting in visual glitches and/or an unusable terminal.
+        #
+        # So instead of relying on the default curses signal handler,
+        # we implement a SIGTSTP signal handler that will only switch
+        # terminal modes if a subprocess isn't in control of the terminal.
+        #
+        # Python's `signal` module is not aware of any signals installed
+        # by C libraries such as Ncurses, so the new signal handler won't
+        # invoke any existing SIGTSTP signal handlers.
+        def fm_owns_terminal_mode():
+            # Maintenance note: everything that may spawn subprocesses
+            # that would modify the terminal mode, must be checked here!
+            if self.zombies.ui:
+                for zombie in tuple(self.zombies.ui):
+                    if zombie.poll() is None:
+                        # there is a live UI process
+                        return False
+            return True
+
+        def sigtstp_handler(signum, frame):
+            # sigtstp_handler may be invoked many times
+            # before we regain control of the terminal
+            # and should be idempotent
+            if fm_owns_terminal_mode():
+                self.ui.suspend()
+            # process is suspended
+            call_signal_handler(signal.SIG_DFL, signum, frame)
+            # process resumes
+            if fm_owns_terminal_mode():
+                self.ui.initialize()
+
+        signal.signal(signal.SIGTSTP, sigtstp_handler)
+
         self.rifle.hook_logger = self.notify
         old_preprocessing_hook = self.rifle.hook_command_preprocessing
 
@@ -143,14 +241,15 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         # The requirements to use it are:
         # 1. set open_all_images to true
         # 2. ensure no files are marked
-        # 3. call rifle with a command that starts with "sxiv " or "feh "
+        # 3. call rifle with a command that starts with "sxiv " or similarly
+        #    behaved image viewers
         def sxiv_workaround_hook(command):
             import re
             from ranger.ext.shell_escape import shell_quote
 
             if self.settings.open_all_images and \
                     not self.thisdir.marked_items and \
-                    re.match(r'^(feh|sxiv|imv|pqiv) ', command):
+                    re.match(r'^(feh|n?sxiv|imv|pqiv) ', command):
 
                 images = [f.relative_path for f in self.thisdir.files if f.image]
                 escaped_filenames = " ".join(shell_quote(f) for f in images if "\x00" not in f)
@@ -159,7 +258,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                         "$@" in command:
                     new_command = None
 
-                    if command[0:5] == 'sxiv ':
+                    if command[0:5] == 'sxiv ' or command[0:6] == 'nsxiv ':
                         number = images.index(self.thisfile.relative_path) + 1
                         new_command = command.replace("sxiv ", "sxiv -n %d " % number, 1)
 
@@ -187,7 +286,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
 
         def mylogfunc(text):
             self.notify(text, bad=True)
-        self.run = Runner(ui=self.ui, logfunc=mylogfunc, fm=self)
+        self.run = Runner(ui=self.ui, logfunc=mylogfunc, fm=self, zombies=self.zombies)
 
         self.settings.signal_bind(
             'setopt.metadata_deep_search',
@@ -291,9 +390,12 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             if os.environ.get('RANGER_LOAD_DEFAULT_RC', 'TRUE').upper() != 'FALSE':
                 sys.stderr.write("\n> To stop ranger from loading "
                                  "\033[1mboth\033[0m the default and your custom rc.conf,\n"
-                                 "  please set the environment variable "
+                                 "  you can set the environment variable "
                                  "\033[1mRANGER_LOAD_DEFAULT_RC\033[0m to "
-                                 "\033[1mFALSE\033[0m.\n")
+                                 "\033[1mFALSE\033[0m.\n"
+                                 "  WARNING: this will give you more maintenance work in the"
+                                 "long run,\n"
+                                 "  like setting values for all new settings in the future.\n")
         else:
             sys.stderr.write("Unknown config file `%s'\n" % which)
 
@@ -335,7 +437,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         Groups the paths into a dictionary with their dirnames as keys and a set of
         basenames as entries.
         """
-        groups = dict()
+        groups = {}
         for path in paths:
             abspath = os.path.abspath(os.path.expanduser(path))
             dirname, basename = os.path.split(abspath)
@@ -400,7 +502,7 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
         ui = self.ui
         throbber = ui.throbber
         loader = self.loader
-        zombies = self.run.zombies
+        zombies = self.zombies
 
         ranger.api.hook_ready(self)
 
@@ -440,14 +542,14 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
             if ranger.args.choosedir and self.thisdir and self.thisdir.path:
                 # XXX: UnicodeEncodeError: 'utf-8' codec can't encode character
                 # '\udcf6' in position 42: surrogates not allowed
-                with open(ranger.args.choosedir, 'w') as fobj:
+                with open(ranger.args.choosedir, 'w', encoding="utf-8") as fobj:
                     fobj.write(self.thisdir.path)
             self.bookmarks.remember(self.thisdir)
             self.bookmarks.save()
 
             # Save tabs
             if not ranger.args.clean and self.settings.save_tabs_on_exit and len(self.tabs) > 1:
-                with open(self.datapath('tabs'), 'a') as fobj:
+                with open(self.datapath('tabs'), 'a', encoding="utf-8") as fobj:
                     # Don't save active tab since launching ranger changes the active tab
                     fobj.write('\0'.join(v.path for t, v in self.tabs.items())
                                + '\0\0')

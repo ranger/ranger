@@ -101,25 +101,39 @@ class TitleBar(Widget):
             bar.add(self.fm.hostname, 'hostname', clr, fixed=True)
             bar.add(' ', 'hostname', clr, fixed=True)
 
-        pathway = self.fm.thistab.pathway
-        if self.settings.tilde_in_titlebar \
-           and (self.fm.thisdir.path.startswith(self.fm.home_path + "/")
-                or self.fm.thisdir.path == self.fm.home_path):
-            pathway = pathway[self.fm.home_path.count('/') + 1:]
-            bar.add('~/', 'directory', fixed=True)
+        if self.fm.thisdir:
+            pathway = self.fm.thistab.pathway
+            if self.settings.tilde_in_titlebar \
+                and (self.fm.thisdir.path.startswith(
+                    self.fm.home_path + "/") or self.fm.thisdir.path == self.fm.home_path):
+                pathway = pathway[self.fm.home_path.count('/') + 1:]
+                bar.add('~/', 'directory', fixed=True)
 
-        for path in pathway:
-            if path.is_link:
-                clr = 'link'
-            else:
-                clr = 'directory'
+            for path in pathway:
+                if path.is_link:
+                    clr = 'link'
+                else:
+                    clr = 'directory'
 
-            bar.add(path.basename, clr, directory=path)
+                bidi_basename = self.bidi_transpose(path.basename)
+                bar.add(bidi_basename, clr, directory=path)
+                bar.add('/', clr, fixed=True, directory=path)
+
+            if self.fm.thisfile is not None and \
+                    self.settings.show_selection_in_titlebar:
+                bidi_file_path = self.bidi_transpose(self.fm.thisfile.relative_path)
+                bar.add(bidi_file_path, 'file')
+        else:
+            path = self.fm.thistab.path
+            if self.settings.tilde_in_titlebar \
+                and (self.fm.thistab.path.startswith(
+                    self.fm.home_path + "/") or self.fm.thistab.path == self.fm.home_path):
+                path = path[len(self.fm.home_path + "/"):]
+                bar.add('~/', 'directory', fixed=True)
+
+            clr = 'directory'
+            bar.add(path, clr, directory=path)
             bar.add('/', clr, fixed=True, directory=path)
-
-        if self.fm.thisfile is not None and \
-                self.settings.show_selection_in_titlebar:
-            bar.add(self.fm.thisfile.relative_path, 'file')
 
     def _get_right_part(self, bar):
         # TODO: fix that pressed keys are cut off when chaining CTRL keys

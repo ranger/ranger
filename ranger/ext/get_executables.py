@@ -3,9 +3,10 @@
 
 from __future__ import (absolute_import, division, print_function)
 
-from stat import S_IXOTH, S_IFREG
 from os import listdir, environ, stat
+import platform
 import shlex
+from stat import S_IXOTH, S_IFREG
 
 from ranger.ext.iter_tools import unique
 
@@ -21,6 +22,13 @@ def get_executables():
     return _cached_executables
 
 
+def _in_wsl():
+    # Check if the current environment is Microsoft WSL instead of native Linux
+    # WSL 2 has `WSL2` in the release string but WSL 1 does not, both contain
+    # `microsoft`, lower case.
+    return 'microsoft' in platform.release()
+
+
 def get_executables_uncached(*paths):
     """Return all executable files in each of the given directories.
 
@@ -34,7 +42,10 @@ def get_executables_uncached(*paths):
         paths = unique(pathstring.split(':'))
 
     executables = set()
+    in_wsl = _in_wsl()
     for path in paths:
+        if in_wsl and path.startswith('/mnt/c/'):
+            continue
         try:
             content = listdir(path)
         except OSError:

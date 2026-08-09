@@ -12,7 +12,7 @@ from __future__ import (absolute_import, division, print_function)
 import ranger.api
 
 
-HOOK_INIT_OLD = ranger.api.hook_init
+original_hook = ranger.api.hook_init
 
 
 def hook_init(fm):
@@ -30,6 +30,9 @@ def hook_init(fm):
 
         def ipc_reader(filepath):
             while True:
+                # The IPC encoding depends on the system locale so we can't
+                # guess here.
+                # pylint: disable=unspecified-encoding
                 with open(filepath, 'r') as fifo:
                     line = fifo.read()
                     fm.execute_console(line.strip())
@@ -47,7 +50,7 @@ def hook_init(fm):
         # IPC support disabled
         pass
     finally:
-        HOOK_INIT_OLD(fm)
+        original_hook(fm)
 
 
 ranger.api.hook_init = hook_init

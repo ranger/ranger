@@ -55,8 +55,8 @@ Update the website
 * [ ] Update both signatures `gpg --local-user 0x00FB5CDF --sign --detach-sign <file>`
 * [ ] Update the man page
     * [ ] run `make manhtml` in ranger's repository
-    * [ ] copy the generated `doc/ranger.1.html` to the `ranger.github.io` repository
-* [ ] Rebuild the website, see `README.md` in https://github.com/ranger/ranger.github.io
+    * [ ] copy the generated `doc/ranger.1.html` to the `pages` repository
+* [ ] Rebuild the website, see `README.md` in the `pages` repository
 * [ ] Commit & push the website
 
 Make a PyPI release

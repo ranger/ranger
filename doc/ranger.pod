@@ -1,4 +1,5 @@
 =encoding utf8
+
 =head1 NAME
 
 ranger - visual file manager
@@ -102,9 +103,10 @@ Create copies of the default configuration files in your local configuration
 directory.  Existing ones will not be overwritten.  Possible values: I<all>,
 I<commands>, I<commands_full>, I<rc>, I<rifle>, I<scope>.
 
-Note: You may want to disable loading of the global configuration files by
-exporting I<RANGER_LOAD_DEFAULT_RC=FALSE> in your environment.  See also:
-B<FILES>, B<ENVIRONMENT>
+Note: You can disable loading of the global F<rc.conf> by exporting
+I<RANGER_LOAD_DEFAULT_RC=FALSE> in your environment. Only do so if your
+configuration is complete, as settings that are not specified will be
+undefined. See also: B<FILES>, B<ENVIRONMENT>
 
 --copy-config=B<commands> will copy only a small sample configuration file with
 a thoroughly commented example.  It is recommended to keep this file tidy to
@@ -229,12 +231,17 @@ C<img2txt> (from C<caca-utils>) for ASCII-art image previews
 
 =item -
 
-C<w3mimgdisplay>, C<ueberzug>, C<mpv>, C<iTerm2>, C<kitty>, C<terminology> or
-C<urxvt> for image previews
+C<w3mimgdisplay>, C<ueberzug>, C<mpv>, C<iTerm2>, C<kitty> (or other terminal
+supporting the Kitty graphics protocol), C<terminology> or C<urxvt> for image
+previews
 
 =item -
 
-C<convert> (from C<imagemagick>) to auto-rotate images and for SVG previews
+C<convert> (from C<imagemagick>) to auto-rotate images and for image previews
+
+=item -
+
+C<rsvg-convert> (from C<librsvg>) for SVG previews
 
 =item -
 
@@ -246,11 +253,12 @@ C<highlight>, C<bat> or C<pygmentize> for syntax highlighting of code
 
 =item -
 
-C<atool>, C<bsdtar>, C<unrar> and/or C<7z> to preview archives
+C<atool>, C<bsdtar>, C<unrar> and/or C<7zz> to preview archives
 
 =item -
 
-C<bsdtar>, C<tar>, C<unrar>, C<unzip> and/or C<zipinfo> (and C<sed>) to preview archives as their first image
+C<bsdtar>, C<tar>, C<unrar>, C<unzip> and/or C<zipinfo> (and C<sed>) to preview
+archives as their first image
 
 =item -
 
@@ -258,7 +266,8 @@ C<lynx>, C<w3m> or C<elinks> to preview html pages
 
 =item -
 
-C<pdftotext> or C<mutool> (and C<fmt>) for textual pdf previews, C<pdftoppm> to preview as image
+C<pdftotext> or C<mutool> (and C<fmt>) for textual pdf previews, C<pdftoppm> to
+preview as image
 
 =item -
 
@@ -286,7 +295,20 @@ C<python> or C<jq> for JSON files
 
 =item -
 
+C<sqlite3> for listing tables in SQLite database (and optionally C<sqlite-utils> for fancier box drawing.)
+
+=item -
+
 C<fontimage> for font previews
+
+=item -
+
+C<openscad> for 3D model previews (stl, off, dxf, scad, csg)
+
+=item -
+
+C<draw.io> for draw.io L<https://app.diagrams.net/> diagram previews (drawio
+extension)
 
 =back
 
@@ -310,9 +332,20 @@ This feature relies on the dimensions of the terminal's font.  By default, a
 width of 8 and height of 11 are used.  To use other values, set the options
 C<iterm2_font_width> and C<iterm2_font_height> to the desired values.
 
+=head3 sixel
+
+This works in most terminal emulators, including all terminals based on VTE >=0.68
+(e.g. GNOME Terminal), iTerm2, MinTTY, WezTerm and many others.
+
+To enable this feature, install C<imagemagick> and set the option
+C<preview_images_method> to sixel.
+
+Preferred dithering method can be specified by setting C<sixel_dithering>.
+
 =head3 kitty
 
-This only works in Kitty. It requires PIL (or pillow) to work.
+This works in terminals supporting the Kitty graphics protocol. It requires PIL
+(or pillow) to work.
 Allows remote image previews, for example in an ssh session.
 
 To enable this feature, set the option C<preview_images_method> to kitty.
@@ -350,8 +383,8 @@ To enable this feature, set the option C<preview_images_method> to urxvt-full.
 
 =head3 w3m
 
-This does not work over ssh, requires certain terminals (tested on "xterm" and
-"urxvt") and is incompatible with tmux, although it works with screen.
+This does not work over ssh, requires certain terminals (tested on "xterm",
+"urxvt", and "Alacritty") and is compatible with tmux and screen.
 
 To enable this feature, install the program "w3m" and set the option
 C<preview_images_method> to w3m.
@@ -509,7 +542,7 @@ a function that ranger uses.  This allows you to change pretty much every part
 of ranger, but there is no guarantee that things will continue to work in
 future versions as the source code evolves.
 
-Adding new commands via a plugin as simple as specifying them like you would do
+Adding new commands via a plugin is as simple as specifying them like you would do
 in the I<commands.py>.
 
 There are some hooks that are specifically made for the use in plugins.  They
@@ -578,7 +611,7 @@ Reload everything
 Toggle I<freeze_files> setting.  When active (indicated by a cyan I<FROZEN>
 message in the status bar), directories and files will not be loaded, improving
 performance when all the files you need are already loaded.  This does not
-affect file previews, which can be toggled with I<zI>.  Also try disabling the
+affect file previews, which can be toggled with I<zp>.  Also try disabling the
 preview of directories with I<zP>.
 
 =item ^L
@@ -766,6 +799,10 @@ Go to the next or previous tab. You can also use TAB and SHIFT+TAB instead.
 
 Close the current tab.  The last tab cannot be closed this way.
 
+=item ~
+
+Toggle between viewmodes. See viewmode in I<SETTINGS> section.
+
 =item M
 
 A key chain that allows you to quickly change the line mode of all the files of
@@ -884,12 +921,12 @@ Backspace.
 
 =item Left Mouse Button
 
-Click on something and you'll move there.  To run a file, "enter" it, like a
-directory, by clicking on the preview.
+Click on something and you'll move there.
 
 =item Right Mouse Button
 
-Enter a directory or run a file.
+Enter a directory or run a file. To run a file you can either right click the
+file in the main column or right click on the preview.
 
 =item Scroll Wheel
 
@@ -904,7 +941,7 @@ scrolling to switch directories.
 =head1 SETTINGS
 
 This section lists all built-in settings of ranger.  The valid types for the
-value are in [brackets].  The hotkey to toggle the setting is in <brakets>, if
+value are in [brackets].  The hotkey to toggle the setting is in <brackets>, if
 a hotkey exists.
 
 Settings can be changed in the file F<~/.config/ranger/rc.conf> or on the
@@ -994,8 +1031,14 @@ with the preview column being as large as the other columns combined.
 =item confirm_on_delete [string]
 
 Ask for a confirmation when running the "delete" command?  Valid values are
-"always" (default), "never", "multiple". With "multiple", ranger will ask only
+"always", "never", "multiple" (default). With "multiple", ranger will ask only
 if you delete multiple files at once.
+
+=item confirm_on_trash [string]
+
+Ask for a confirmation when running the "trash" command?  Valid values are
+"always", "never", "multiple", "like_delete" (default). With "like_delete",
+ranger will honor the parameter "confirm_on_delete" instead.
 
 =item dirname_in_tabs [bool]
 
@@ -1040,7 +1083,14 @@ on top of those for I<draw_borders>:
 Draw a progress bar in the status bar which displays the average state of all
 currently running tasks which support progress bars?
 
-=item flushinput [bool] <zi>
+=item filter_dead_tabs_on_startup [bool]
+
+Remove tabs with unavailable paths on startup. Setting this to false (the
+default) will keep all saved tabs, even if their path is no longer reachable.
+This can be useful to save tabs with paths on removable media or network
+volumes.
+
+=item flushinput [bool] <zI>
 
 Flush the input after each key hit?  One advantage is that when scrolling down
 with "j", ranger stops scrolling instantly when you release the key.  One
@@ -1078,6 +1128,14 @@ Show hostname in titlebar?
 =item size_in_bytes [bool]
 
 Print file sizes in bytes instead of the default human-readable format.
+
+=item binary_size_prefix [bool]
+
+Shows large filesizes with binary unit prefixes - kibibytes=Ki, mebibytes=Mi etc.
+instead of the default decimal prefixes - kilobytes=k, megabytes=M etc.
+Each binary unit prefix signifies 1024=2^10 of the preceding unit prefix (there
+are 1024 KiB in 1 MiB) as opposed to decimal unit prefixes which signify a 1000
+of the preceding unit prefix (there are 1000 kB in 1 MB)
 
 =item idle_delay [integer]
 
@@ -1148,8 +1206,8 @@ will be temporarily disabled automatically.
 =item padding_right [bool]
 
 When collapse_preview is on and there is no preview, should there remain a
-little padding on the right?  This allows you to click into that space to run
-the file.
+little padding on the right?  This allows you to right click into that space to
+run the file.
 
 =item preview_directories [bool] <zP>
 
@@ -1159,7 +1217,7 @@ Preview directories in the preview column?
 
 Preview files in the preview column?
 
-=item preview_images [bool]
+=item preview_images [bool] <zi>
 
 Draw images inside the console with the external program w3mimgpreview?
 
@@ -1183,6 +1241,10 @@ the content.
 
 When line_numbers is set to relative, show 0 on the current line if
 true or show the absolute number of the current line when false.
+
+=item renumber_tabs_on_tab_close [bool]
+
+After closing a tab the tabs will automatically renumber if true.
 
 =item save_backtick_bookmark [bool]
 
@@ -1316,6 +1378,16 @@ Offset in pixels for the inner border of the terminal. Some terminals require
 the offset to be specified explicitly, among others st and UXterm, some don't
 like urxvt.
 
+=item sixel_dithering [string]
+
+One of dithering methods supported by C<convert>, used for SIXEL image previews.
+
+C<convert> currently supports the following dithering methods:
+
+ None             No dithering
+ Riemersma        Dithering along a Hilbert curve with restricted error proliferation
+ FloydSteinberg   Error diffusion dithering
+
 =item wrap_plaintext_previews [bool]
 
 Whether or not to wrap long lines in the pager, this includes previews of plain
@@ -1342,7 +1414,7 @@ You can always get a list of the currently existing commands by typing "?c" in
 ranger.  For your convenience, this is a list of the "public" commands including their parameters, excluding descriptions:
 
  alias [newcommand] [oldcommand]
- bulkrename
+ bulkrename [-FLAGS...]
  cd [path]
  chain command1[; command2[; command3...]]
  chmod octal_number
@@ -1388,6 +1460,8 @@ ranger.  For your convenience, this is a list of the "public" commands including
  search pattern
  search_inc pattern
  set option value
+ setinpath [path=<path>] option value
+ setinregex [re=<regex>] option value
  setintag tags option value
  setlocal [path=<path>] option value
  shell [-FLAGS...] command
@@ -1415,7 +1489,7 @@ These are the public commands including their descriptions:
 
 Copies the oldcommand as newcommand.
 
-=item bulkrename
+=item bulkrename [-I<flags>]
 
 This command opens a list of selected files in an external editor.  After you
 edit and save the file, it will generate a shell script which does bulk
@@ -1423,6 +1497,10 @@ renaming according to the changes you did in the file.
 
 This shell script is opened in an editor for you to review.  After you close
 it, it will be executed.
+
+Optional flags may be supplied to control how the generated shell script is
+executed.  See the FLAGS section for details.  By default, the C<w> flag is
+used.
 
 =item cd [I<path>]
 
@@ -1558,7 +1636,7 @@ Filter files so only files that have duplicates in the same directory are
 shown. Useful when cleaning up identical songs and memes that were saved using
 distinct file names.
 
-=item filename NAME
+=item name NAME
 
 Filter files that contain NAME in the filename, regular expression syntax is
 allowed.
@@ -1667,7 +1745,7 @@ Sets the linemode of all files in the current directory.  The linemode may be:
    format, more precise the more recent.
  "sizemtime":
    display each line as "<basename>...<size> <mtime>" in ISO format
- "humanreadablesizemtime":
+ "sizehumanreadablemtime":
    display each line as "<basename>...<size> <mtime>" in a human
    readable format, more precise the more recent.
  "permissions":
@@ -1837,6 +1915,32 @@ doesn't work for functions and regular expressions. Valid values are:
  list           | 1,2,3,4
  none           | none
 
+=item setinpath [path=I<path>] I<option> I<value>
+
+Assigns a new value to an option, but locally for the directory given by
+I<path>. This means, that this option only takes effect when visiting that
+directory. If no path is given, uses the current directory.
+
+I<path> can be quoted with either single or double quotes to prevent unwanted
+splitting, I<path='~/dl dl'> or I<path="~/dl dl">. You can use "pattern" rather
+than "path" for consistency with C<setinregex>.
+
+=item setinregex [re=I<regex>] I<option> I<value>
+
+Assigns a new value to an option, but locally for directories matching
+I<regex>. This means, that this option only takes effect when visiting such
+directories. If no regular expression is given, uses the current directory.
+
+I<regex> is a regular expression.  This means that C<re=~/dl> applies to all
+paths that start with I<~/dl>, e.g. I<~/dl2> and I<~/dl/foo>. To avoid this,
+use C<path=~/dl$>.  To specify a folder with special characters
+(.^$\*+?(){}[]|), escape them with a backslash.
+
+I<regex> can be quoted with either single or double quotes to prevent unwanted
+splitting,. I<re='~/dl dl$'> or I<re="~/dl dl$">. You can use "regex" rather
+than "re" to avoid having to remember the spelling and you can use "pattern"
+for consistency with C<setinpath>.
+
 =item setintag I<tags> I<option> I<value>
 
 Assigns a new value to an option, but locally for the directories that are
@@ -1850,16 +1954,7 @@ with the I<v> tag by typing I<"v>, then use this command:
 
 =item setlocal [path=I<path>] I<option> I<value>
 
-Assigns a new value to an option, but locally for the directory given by
-I<path>. This means, that this option only takes effect when visiting that
-directory. If no path is given, uses the current directory.
-
-I<path> is a regular expression.  This means that C<path=~/dl> applies to all
-paths that start with I<~/dl>, e.g. I<~/dl2> and I<~/dl/foo>. To avoid this,
-use C<path=~/dl$>.
-
-I<path> can be quoted with either single or double quotes to prevent unwanted
-splitting. I<path='~/dl dl$'> or I<path="~/dl dl$">
+Alias for C<setinpath>.
 
 =item shell [-I<flags>] I<command>
 
@@ -2044,9 +2139,9 @@ by checking for this variable.
 
 =item RANGER_LOAD_DEFAULT_RC
 
-If this variable is set to FALSE, ranger will not load the default rc.conf.
-This can save time if you copied the whole rc.conf to I<~/.config/ranger/> and
-don't need the default one at all.
+If this variable is set to FALSE, ranger will not load the default F<rc.conf>.
+This can save time if you copied the whole F<rc.conf> to I<~/.config/ranger/>
+and don't need the default one at all.
 
 =item VISUAL
 
@@ -2068,6 +2163,13 @@ the "S" key.  Defaults to "/bin/sh".
 Defines the terminal emulator command that ranger is going to use with the
 :terminal command and the "t" run flag.  Defaults to "xterm".
 
+=item BAT_STYLE
+
+Specifies the style to be used for syntax highlighting when I<bat> is
+installed, unless I<highlight> is also installed. Find out possible values in
+I<bat>'s man page. This defaults to plain to make maximal use of horizontal
+space.
+
 =item BAT_THEME
 
 Specifies the theme to be used for syntax highlighting when I<bat> is
@@ -2085,7 +2187,8 @@ running:
 =item HIGHLIGHT_STYLE
 
 Specifies the theme to be used for syntax highlighting when I<highlight> is
-installed. Find out possible values by running C<highlight --list-themes>.
+installed. Find out possible values by running
+C<highlight --list-scripts=themes>.
 
 =item HIGHLIGHT_TABWIDTH
 
@@ -2144,7 +2247,7 @@ provided along with the source code.
 
 =head1 LICENSE
 
-GNU General Public License 3 or (at your option) any later version.
+GNU General Public License 3.
 
 
 
@@ -2153,13 +2256,20 @@ GNU General Public License 3 or (at your option) any later version.
 
 =over
 
-=item Download: L<https://ranger.github.io/ranger-stable.tar.gz>
+=item Download: L<https://ranger.fm/ranger-stable.tar.gz>
 
-=item The project page: L<https://ranger.github.io/>
+=item The project page: L<https://ranger.fm/>
 
 =item The mailing list: L<https://savannah.nongnu.org/mail/?group=ranger>
 
-=item IRC channel: #ranger on freenode.net
+=item IRC channel: #ranger on irc.libera.chat
+
+=over 9
+
+Don't have an IRC client? Join us via the webchat!
+L<https://web.libera.chat/#ranger>
+
+=back
 
 =back
 

@@ -93,7 +93,7 @@ class Solarized(ColorScheme):
         elif context.in_titlebar:
             attr |= bold
             if context.hostname:
-                fg = 16 if context.bad else 255
+                fg = default if context.bad else 255
                 if context.bad:
                     bg = 166
             elif context.directory:

@@ -2,7 +2,7 @@
 # License: GNU GPL version 3, see the file "AUTHORS" for details.
 
 NAME = ranger
-VERSION = $(shell grep -m 1 -o '[0-9][0-9.]\+\S*' README.md)
+VERSION = $(shell grep -m 1 -o '[0-9]\+\(\.\S\+\)\+' README.md)
 NAME_RIFLE = rifle
 VERSION_RIFLE = $(VERSION)
 SNAPSHOT_NAME ?= $(NAME)-$(VERSION)-$(shell git rev-parse HEAD | cut -b 1-8).tar.gz
@@ -135,13 +135,13 @@ test_other:
 test: test_py test_shellcheck
 	@echo "$(bold)Finished testing: All tests passed!$(normal)"
 
-doc/ranger.1: doc/ranger.pod README.md
+doc/ranger.1: doc/ranger.pod
 	pod2man --stderr --center='ranger manual' \
 		--date='$(NAME)-$(VERSION)' \
 		--release=$(shell date -u '+%Y-%m-%d') \
 		doc/ranger.pod doc/ranger.1
 
-doc/rifle.1: doc/rifle.pod README.md
+doc/rifle.1: doc/rifle.pod
 	pod2man --stderr --center='rifle manual' \
 		--date='$(NAME_RIFLE)-$(VERSION_RIFLE)' \
 		--release=$(shell date -u '+%Y-%m-%d') \

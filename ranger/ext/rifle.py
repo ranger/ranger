@@ -16,12 +16,15 @@ Example usage:
 
 from __future__ import (absolute_import, division, print_function)
 
+from contextlib import contextmanager
 import os.path
 import re
-from subprocess import Popen, PIPE
+import shlex
+from subprocess import CalledProcessError, PIPE, Popen
 import sys
 
-__version__ = 'rifle 1.9.3'
+
+__version__ = 'rifle 1.9.4'
 
 # Options and constants that a user might want to change:
 DEFAULT_PAGER = 'less'
@@ -34,13 +37,13 @@ ENCODING = 'utf-8'
 try:
     from ranger.ext.get_executables import get_executables
 except ImportError:
-    _CACHED_EXECUTABLES = None
+    cached_executables = None  # pylint: disable=invalid-name
 
     def get_executables():
         """Return all executable files in $PATH + Cache them."""
-        global _CACHED_EXECUTABLES  # pylint: disable=global-statement
-        if _CACHED_EXECUTABLES is not None:
-            return _CACHED_EXECUTABLES
+        global cached_executables  # pylint: disable=global-statement
+        if cached_executables is not None:
+            return cached_executables
 
         if 'PATH' in os.environ:
             paths = os.environ['PATH'].split(':')
@@ -49,7 +52,7 @@ except ImportError:
 
         from stat import S_IXOTH, S_IFREG
         paths_seen = set()
-        _CACHED_EXECUTABLES = set()
+        cached_executables = set()
         for path in paths:
             if path in paths_seen:
                 continue
@@ -65,8 +68,66 @@ except ImportError:
                 except OSError:
                     continue
                 if filestat.st_mode & (S_IXOTH | S_IFREG):
-                    _CACHED_EXECUTABLES.add(item)
-        return _CACHED_EXECUTABLES
+                    cached_executables.add(item)
+        return cached_executables
+
+
+try:
+    from ranger.ext.popen23 import Popen23
+except ImportError:
+    # COMPAT: Python 2 (and Python <=3.2) subprocess.Popen objects aren't
+    #         context managers. We don't care about early Python 3 but we do
+    #         want to wrap Python 2's Popen. There's no harm in always using
+    #         this Popen but it is only necessary when used with
+    #         with-statements. This can be removed once we ditch Python 2
+    #         support.
+    # pylint: disable=ungrouped-imports
+
+    try:
+        from ranger import PY3
+    except ImportError:
+        from sys import version_info
+        PY3 = version_info[0] >= 3
+
+    @contextmanager
+    def Popen23(*args, **kwargs):  # pylint: disable=invalid-name
+        if PY3:
+            yield Popen(*args, **kwargs)
+            return
+        else:
+            popen2 = Popen(*args, **kwargs)
+        try:
+            yield popen2
+        finally:
+            # From Lib/subprocess.py Popen.__exit__:
+            if popen2.stdout:
+                popen2.stdout.close()
+            if popen2.stderr:
+                popen2.stderr.close()
+            try:  # Flushing a BufferedWriter may raise an error
+                if popen2.stdin:
+                    popen2.stdin.close()
+            except KeyboardInterrupt:
+                # https://bugs.python.org/issue25942
+                # In the case of a KeyboardInterrupt we assume the SIGINT
+                # was also already sent to our child processes.  We can't
+                # block indefinitely as that is not user friendly.
+                # If we have not already waited a brief amount of time in
+                # an interrupted .wait() or .communicate() call, do so here
+                # for consistency.
+                # pylint: disable=protected-access
+                if popen2._sigint_wait_secs > 0:
+                    try:
+                        # pylint: disable=no-member
+                        popen2._wait(timeout=popen2._sigint_wait_secs)
+                    except Exception:  # pylint: disable=broad-except
+                        # COMPAT: This is very broad but Python 2.7 does not
+                        # have TimeoutExpired, nor SubprocessError
+                        pass
+                popen2._sigint_wait_secs = 0  # Note that this's been done.
+            else:
+                # Wait for the process to terminate, to avoid zombies.
+                popen2.wait()
 
 
 try:
@@ -80,9 +141,13 @@ except ImportError:
             return False
         if pid == 0:
             os.setsid()
-            kwargs['stdin'] = open(os.devnull, 'r')
-            kwargs['stdout'] = kwargs['stderr'] = open(os.devnull, 'w')
-            Popen(*args, **kwargs)
+            # pylint: disable=unspecified-encoding
+            with open(os.devnull, "r") as null_r, open(
+                os.devnull, "w"
+            ) as null_w:
+                kwargs["stdin"] = null_r
+                kwargs["stdout"] = kwargs["stderr"] = null_w
+                Popen(*args, **kwargs)  # pylint: disable=consider-using-with
             os._exit(0)  # pylint: disable=protected-access
         return True
 
@@ -125,6 +190,20 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         pass
 
     @staticmethod
+    def hook_process_open(*popen_args, **popen_kws):
+        # pylint: disable=consider-using-with
+        return Popen(
+            *popen_args,
+            **popen_kws
+        )
+
+    @staticmethod
+    def hook_process_exit(process, cmd):
+        exit_code = process.returncode
+        if exit_code != 0:
+            raise CalledProcessError(exit_code, shlex.join(cmd))
+
+    @staticmethod
     def hook_command_preprocessing(command):
         return command
 
@@ -159,20 +238,20 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         """Replace the current configuration with the one in config_file"""
         if config_file is None:
             config_file = self.config_file
-        fobj = open(config_file, 'r')
-        self.rules = []
-        for line in fobj:
-            line = line.strip()
-            if line.startswith('#') or line == '':
-                continue
-            if self.delimiter1 not in line:
-                raise ValueError("Line without delimiter")
-            tests, command = line.split(self.delimiter1, 1)
-            tests = tests.split(self.delimiter2)
-            tests = tuple(tuple(f.strip().split(None, 1)) for f in tests)
-            command = command.strip()
-            self.rules.append((command, tests))
-        fobj.close()
+        # pylint: disable=unspecified-encoding
+        with open(config_file, "r") as fobj:
+            self.rules = []
+            for line in fobj:
+                line = line.strip()
+                if line.startswith('#') or line == '':
+                    continue
+                if self.delimiter1 not in line:
+                    raise ValueError("Line without delimiter")
+                tests, command = line.split(self.delimiter1, 1)
+                tests = tests.split(self.delimiter2)
+                tests = tuple(tuple(f.strip().split(None, 1)) for f in tests)
+                command = command.strip()
+                self.rules.append((command, tests))
 
     def _eval_condition(self, condition, files, label):
         # Handle the negation of conditions starting with an exclamation mark,
@@ -213,7 +292,10 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         elif function == 'path':
             return bool(re.search(argument, os.path.abspath(files[0])))
         elif function == 'mime':
-            return bool(re.search(argument, self.get_mimetype(files[0])))
+            mimetype = self.get_mimetype(files[0])
+            if mimetype is None:
+                return False
+            return bool(re.search(argument, mimetype))
         elif function == 'has':
             if argument.startswith("$"):
                 if argument[1:] in os.environ:
@@ -256,14 +338,23 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
         self._mimetype, _ = mimetypes.guess_type(fname)
 
         if not self._mimetype:
-            process = Popen(["file", "--mime-type", "-Lb", fname], stdout=PIPE, stderr=PIPE)
-            mimetype, _ = process.communicate()
-            self._mimetype = mimetype.decode(ENCODING).strip()
+            try:
+                with Popen23(
+                    ["file", "--mime-type", "-Lb", fname], stdout=PIPE, stderr=PIPE
+                ) as process:
+                    mimetype, _ = process.communicate()
+                self._mimetype = mimetype.decode(ENCODING).strip()
+            except OSError:
+                self._mimetype = None
+                self.hook_logger("file(1) is not available to determine mime-type")
             if self._mimetype == 'application/octet-stream':
                 try:
-                    process = Popen(["mimetype", "--output-format", "%m", fname],
-                                    stdout=PIPE, stderr=PIPE)
-                    mimetype, _ = process.communicate()
+                    with Popen23(
+                        ["mimetype", "--output-format", "%m", fname],
+                        stdout=PIPE,
+                        stderr=PIPE,
+                    ) as process:
+                        mimetype, _ = process.communicate()
                     self._mimetype = mimetype.decode(ENCODING).strip()
                 except OSError:
                     pass
@@ -307,8 +398,12 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                     count = self._skip
                 yield (count, cmd, self._app_label, self._app_flags)
 
-    def execute(self, files,  # noqa: E501 pylint: disable=too-many-branches,too-many-statements,too-many-locals
-                number=0, label=None, flags="", mimetype=None):
+    def execute(
+        # noqa: E501
+        # pylint: disable=too-many-branches,too-many-statements,too-many-locals
+        # pylint: disable=too-many-positional-arguments
+        self, files, number=0, label=None, flags="", mimetype=None
+    ):
         """Executes the given list of files.
 
         By default, this executes the first command where all conditions apply,
@@ -437,8 +532,12 @@ class Rifle(object):  # pylint: disable=too-many-instance-attributes
                 if 'f' in flags or 't' in flags:
                     Popen_forked(cmd, env=self.hook_environment(os.environ))
                 else:
-                    process = Popen(cmd, env=self.hook_environment(os.environ))
+                    process = self.hook_process_open(
+                        cmd,
+                        env=self.hook_environment(os.environ)
+                    )
                     process.wait()
+                    self.hook_process_exit(process, cmd)
             finally:
                 self.hook_after_executing(command, self._mimetype, self._app_flags)
 
@@ -473,11 +572,11 @@ def find_conf_path():
 
 
 def main():  # pylint: disable=too-many-locals
-    """The main function which is run when you start this program direectly."""
+    """The main function which is run when you start this program directly."""
 
     # Evaluate arguments
     from optparse import OptionParser  # pylint: disable=deprecated-module
-    parser = OptionParser(usage="%prog [-fhlpw] [files]", version=__version__)
+    parser = OptionParser(usage="%prog [options] <file>...", version=__version__)
     parser.add_option('-f', type="string", default="", metavar="FLAGS",
                       help="use additional flags: f=fork, r=root, t=terminal. "
                       "Uppercase flag negates respective lowercase flags.")
@@ -517,9 +616,11 @@ def main():  # pylint: disable=too-many-locals
         number = 0
         label = options.p
 
+    exit_code = 0
+
     if options.w is not None and not options.l:
-        process = Popen([options.w] + list(positional))
-        process.wait()
+        with Popen23([options.w] + list(positional)) as process:
+            exit_code = process.wait()
     else:
         # Start up rifle
         rifle = Rifle(conf_path)
@@ -529,11 +630,17 @@ def main():  # pylint: disable=too-many-locals
             for count, cmd, label, flags in rifle.list_commands(positional):
                 print("%d:%s:%s:%s" % (count, label or '', flags, cmd))
         else:
-            result = rifle.execute(positional, number=number, label=label, flags=options.f)
-            if result == ASK_COMMAND:
-                # TODO: implement interactive asking for file type?
-                print("Unknown file type: %s" %
-                      rifle.get_mimetype(positional[0]))
+            try:
+                result = rifle.execute(positional, number=number, label=label, flags=options.f)
+            except CalledProcessError as ex:
+                exit_code = ex.returncode
+            else:
+                if result == ASK_COMMAND:
+                    # TODO: implement interactive asking for file type?
+                    print("Unknown file type: %s" %
+                          rifle.get_mimetype(positional[0]))
+
+    sys.exit(exit_code)
 
 
 if __name__ == '__main__':

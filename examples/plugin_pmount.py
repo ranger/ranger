@@ -18,7 +18,7 @@ UMOUNT_KEY = '<alt>M'
 LIST_MOUNTS_KEY = '<alt>N'
 
 
-HOOK_INIT_OLD = ranger.api.hook_init
+original_hook = ranger.api.hook_init
 
 
 def hook_init(fm):
@@ -36,7 +36,7 @@ def hook_init(fm):
             fm.execute_console("map {key}{0}{1} chain cd; shell pumount sd{0}{1}".format(
                 disk, part, key=UMOUNT_KEY))
 
-    return HOOK_INIT_OLD(fm)
+    return original_hook(fm)
 
 
 ranger.api.hook_init = hook_init

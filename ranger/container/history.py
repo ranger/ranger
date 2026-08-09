@@ -13,7 +13,6 @@ class HistoryEmptyException(Exception):
 class History(object):
 
     def __init__(self, maxlen=None, unique=True):
-        assert maxlen is not None, "maxlen cannot be None"
         if isinstance(maxlen, History):
             self.history = list(maxlen.history)
             self.index = maxlen.index
@@ -39,7 +38,7 @@ class History(object):
             if self.history and self.history[-1] == item:
                 del self.history[-1]
         # Remove first if list is too long
-        if len(self.history) > max(self.maxlen - 1, 0):
+        if self.maxlen is not None and (len(self.history) > max(self.maxlen - 1, 0)):
             del self.history[0]
         # Append the item and fast forward
         self.history.append(item)
@@ -79,7 +78,7 @@ class History(object):
 
         self.history[:self.index] = list(
             other_history.history[:other_history.index + 1])
-        if len(self.history) > self.maxlen:
+        if self.maxlen is not None and (len(self.history) > self.maxlen):
             self.history = self.history[
                 -self.maxlen:]  # pylint: disable=invalid-unary-operand-type
 
@@ -108,17 +107,11 @@ class History(object):
             raise HistoryEmptyException
 
     def back(self):
-        self.index -= 1
-        if self.index < 0:
-            self.index = 0
+        self.index = max(0, self.index - 1)
         return self.current()
 
     def move(self, n):
-        self.index += n
-        if self.index > len(self.history) - 1:
-            self.index = len(self.history) - 1
-        if self.index < 0:
-            self.index = 0
+        self.index = max(0, min(len(self.history) - 1, self.index + n))
         return self.current()
 
     def search(self, string, n):
@@ -141,9 +134,7 @@ class History(object):
 
     def forward(self):
         if self.history:
-            self.index += 1
-            if self.index > len(self.history) - 1:
-                self.index = len(self.history) - 1
+            self.index = min(self.index + 1, len(self.history) - 1)
         else:
             self.index = 0
         return self.current()

@@ -20,6 +20,9 @@ reset = '\x1b[0m'
 
 
 def split_ansi_from_text(ansi_text):
+    if isinstance(ansi_text, WideString):
+        ansi_text = ansi_text.string
+
     return ansi_re.split(ansi_text)
 
 # For information on the ANSI codes see
@@ -60,6 +63,8 @@ def text_with_fg_bg_attr(ansi_text):  # pylint: disable=too-many-branches,too-ma
 
                 elif n == 1:         # enable attribute
                     attr |= color.bold
+                elif n == 3:
+                    attr |= color.italic
                 elif n == 4:
                     attr |= color.underline
                 elif n == 5:
@@ -119,6 +124,10 @@ def char_len(ansi_text):
     >>> char_len("")
     0
     """
+
+    if isinstance(ansi_text, WideString):
+        ansi_text = ansi_text.string
+
     return len(WideString(ansi_re.sub('', ansi_text)))
 
 

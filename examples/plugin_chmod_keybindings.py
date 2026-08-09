@@ -9,11 +9,11 @@ from __future__ import (absolute_import, division, print_function)
 import ranger.api
 
 
-HOOK_INIT_OLD = ranger.api.hook_init
+original_hook = ranger.api.hook_init
 
 
 def hook_init(fm):
-    HOOK_INIT_OLD(fm)
+    original_hook(fm)
 
     # Generate key bindings for the chmod command
     command = "map {0}{1}{2} shell -d chmod {1}{0}{2} %s"

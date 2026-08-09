@@ -170,7 +170,7 @@ class KeyMaps(dict):
         self.used_keymap = None
 
     def use_keymap(self, keymap_name):
-        self.keybuffer.keymap = self.get(keymap_name, dict())
+        self.keybuffer.keymap = self.get(keymap_name, {})
         if self.used_keymap != keymap_name:
             self.used_keymap = keymap_name
             self.keybuffer.clear()
@@ -179,7 +179,7 @@ class KeyMaps(dict):
         try:
             pointer = self[context]
         except KeyError:
-            self[context] = pointer = dict()
+            self[context] = pointer = {}
         if PY3:
             keys = keys.encode('utf-8').decode('latin-1')
         return list(parse_keybinding(keys)), pointer
@@ -194,9 +194,9 @@ class KeyMaps(dict):
                 if isinstance(pointer[key], dict):
                     pointer = pointer[key]
                 else:
-                    pointer[key] = pointer = dict()
+                    pointer[key] = pointer = {}
             except KeyError:
-                pointer[key] = pointer = dict()
+                pointer[key] = pointer = {}
         pointer[last_key] = leaf
 
     def copy(self, context, source, target):
@@ -225,7 +225,20 @@ class KeyBuffer(object):  # pylint: disable=too-many-instance-attributes
     exclude_from_anykey = [27]
 
     def __init__(self, keymap=None):
+        # Pylint recommends against calling __init__ explicitly and requires
+        # certain fields to be declared in __init__ so we set those to None.
+        # For some reason list fields don't have the same requirement.
+        self.pointer = None
+        self.result = None
+        self.quantifier = None
+        self.finished_parsing_quantifier = None
+        self.finished_parsing = None
+        self.parse_error = None
+
         self.keymap = keymap
+        self.clear()
+
+    def clear(self):
         self.keys = []
         self.wildcards = []
         self.pointer = self.keymap
@@ -238,9 +251,6 @@ class KeyBuffer(object):  # pylint: disable=too-many-instance-attributes
         if self.keymap and self.quantifier_key in self.keymap:
             if self.keymap[self.quantifier_key] == 'false':
                 self.finished_parsing_quantifier = True
-
-    def clear(self):
-        self.__init__(self.keymap)
 
     def add(self, key):
         self.keys.append(key)
