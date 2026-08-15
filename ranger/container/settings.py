@@ -105,6 +105,8 @@ ALLOWED_SETTINGS = {
     'wrap_scroll': bool,
     'xterm_alt_key': bool,
     'sixel_dithering': str,
+    'sixel_type': str,
+    'sixel_custom': str,
 }
 
 ALLOWED_VALUES = {
