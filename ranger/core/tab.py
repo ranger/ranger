@@ -169,7 +169,14 @@ class Tab(FileManagerAware, SettingsAware):  # pylint: disable=too-many-instance
         else:
             pathway = []
             currentpath = '/'
-            for comp in path.split('/'):
+            spath = path.split('/')
+
+            # support cygwin UNC paths
+            if path[:2] == '//':
+                currentpath = '//'
+                spath = spath[2:]
+
+            for comp in spath:
                 currentpath = join(currentpath, comp)
                 pathway.append(self.fm.get_directory(currentpath))
             self.pathway = tuple(pathway)
