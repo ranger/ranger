@@ -2135,3 +2135,7 @@ class paste_ext(Command):
 
     def execute(self):
         return self.fm.paste(make_safe_path=paste_ext.make_safe_path)
+
+class wget(Command):
+    pass
+    # Browsers - Save File option - use Ranger 
