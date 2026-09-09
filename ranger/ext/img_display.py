@@ -290,8 +290,16 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
         if fontw == 0 or fonth == 0:
             raise ImgDisplayUnsupportedException
 
-        max_width_pixels = max_width * fontw
-        max_height_pixels = max_height * fonth - 2
+        # Reduce height when there are screen/tmux status lines.
+        if os.environ.get('WINDOW'):
+            x_offset = 2
+        elif os.environ.get('TMUX'):
+            x_offset = 1
+        else:
+            x_offset = 0
+
+        max_width_pixels = max_width * fontw - fontw
+        max_height_pixels = max_height * fonth - 2 - (fonth * x_offset)
         # (for tmux top status bar)
         # max_height_pixels = (max_height - 1) * fonth - 2
 
@@ -306,18 +314,26 @@ class W3MImageDisplayer(ImageDisplayer, FileManagerAware):
             raise ImageDisplayError('Failed to execute w3mimgdisplay', output)
 
         width = int(output[0])
-        height = int(output[1])
+        height = int(output[1]) - (fonth * x_offset)
 
         # get the maximum image size preserving ratio
-        if width > max_width_pixels:
-            height = (height * max_width_pixels) // width
-            width = max_width_pixels
-        if height > max_height_pixels:
-            width = (width * max_height_pixels) // height
-            height = max_height_pixels
+        if width > height:
+            # ratio = max_width_pixels / width
+            height = int(height * (max_width_pixels / width))
+            width = max_width_pixels + fontw
+        else:
+            # ratio = max_height_pixels / height
+            width = int(width * (max_height_pixels / height))
+            height = max_height_pixels + fonth
 
-        start_x = int((start_x - 0.2) * fontw) + self.fm.settings.w3m_offset
+        start_x = int(start_x * fontw) + self.fm.settings.w3m_offset
         start_y = (start_y * fonth) + self.fm.settings.w3m_offset
+        #print(height + start_y, max_height_pixels)
+        if start_y + height > max_height_pixels:
+            # ratio = height / (max_height_pixels + fonth - 2)
+            width = int(width * (height / (max_height_pixels + fonth - 2)) - (fonth * x_offset))
+            height = max_height_pixels + fonth
+
 
         return "0;1;{x};{y};{w};{h};;;;;{filename}\n4;\n3;\n".format(
             x=start_x,
