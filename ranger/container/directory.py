@@ -127,7 +127,8 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     }
 
     def __init__(self, path, **kw):
-        assert not os.path.isfile(path), "No directory given!"
+        if not os.path.isdir(path):
+            raise ValueError("Not a directory: '{0}'".format(path))
 
         Loadable.__init__(self, None, None)
         Accumulator.__init__(self)
