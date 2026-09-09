@@ -36,7 +36,7 @@ IMAGE_CACHE_PATH="${4}"  # Full path that should be used to cache image preview
 PV_IMAGE_ENABLED="${5}"  # 'True' if image previews are enabled, 'False' otherwise.
 
 FILE_EXTENSION="${FILE_PATH##*.}"
-FILE_EXTENSION_LOWER="$(printf "%s" "${FILE_EXTENSION}" | tr '[:upper:]' '[:lower:]')"
+FILE_EXTENSION_LOWER="${FILE_EXTENSION,,}"
 
 ## Settings
 HIGHLIGHT_SIZE_MAX=262143  # 256KiB
