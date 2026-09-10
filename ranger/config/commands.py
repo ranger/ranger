@@ -95,6 +95,7 @@ from __future__ import (absolute_import, division, print_function)
 
 from collections import deque
 import os
+import stat
 import re
 from io import open
 
@@ -1188,43 +1189,203 @@ class rename_append(Command):
 
 
 class chmod(Command):
-    """:chmod <octal number>
+    """:chmod <octal number>|<symbolic mode>
 
-    Sets the permissions of the selection to the octal number.
+    Sets the permissions of the selection to the given mode.
 
-    The octal number is between 0 and 777. The digits specify the
-    permissions for the user, the group and others.
+    The octal number is between 0o0000 and 0o7777. The digits specify the
+    permissions for the user, the group and others and the
+    setuid/setgid/sticky bits.
 
     A 1 permits execution, a 2 permits writing, a 4 permits reading.
     Add those numbers to combine them. So a 7 permits everything.
+
+    The symbolic mode is
+        symbolic mode   ::=  clause [, clause ...]
+        clause          ::=  [who ...] [action ...] action
+        action          ::=  op permcopy | op [perm ...]
+        who             ::=  u | g | o | a
+        op              ::=  = | + | -
+        permcopy        ::=  u | g | o
+        perm            ::=  r | w | x | s | t | X
     """
 
+    WHO_RE = re.compile(r'''([ugoa]*)''', re.X)
+    ACTION_RE = re.compile(r'''
+        ([=+-])             # exactly one operator  (group 1)
+        (                   # perms                 (group 2)
+          [ugo]             #   either permcopy
+          |                 #   or
+          [rwxstX]*         #   permissionlist (may be empty)
+        )''', re.X)
+    OCTAL_MODE_RE = re.compile(r'''[0-7]+$''', re.X)
+    MASKS = {
+        'u': {'r': stat.S_IRUSR, 'w': stat.S_IWUSR, 'x': stat.S_IXUSR,
+              's': stat.S_ISUID, 't': 0},
+        'g': {'r': stat.S_IRGRP, 'w': stat.S_IWGRP, 'x': stat.S_IXGRP,
+              's': stat.S_ISGID, 't': 0},
+        'o': {'r': stat.S_IROTH, 'w': stat.S_IWOTH, 'x': stat.S_IXOTH,
+              's': 0,            't': stat.S_ISVTX},
+        'a': {},}
+
+    for perm in 'rwxst':
+        MASKS['a'][perm] = MASKS['u'][perm] | MASKS['g'][perm] | MASKS['o'][perm]
+
+    for entity in 'ugoa':
+        MASKS[entity]['rwx'] = (
+            MASKS[entity]['r'] | MASKS[entity]['w'] | MASKS[entity]['x'])
+        MASKS[entity]['rwxst'] = (MASKS[entity]['rwx'] |
+            MASKS[entity]['s'] | MASKS[entity]['t'])
+
+    def __init__(self, *args, **kwargs):
+        '''init chmod-command.'''
+        super(chmod, self).__init__(*args, **kwargs) # pylint: disable=R1725
+
+    def get_umask(self):
+        '''get os-umask.'''
+        result = os.umask(0o077)
+        os.umask(result)
+        return result
+
+    def fg_extract_rwx_for_source(self, source):
+        '''
+        return function which extracts for given entity ('u', 'g' or 'o')
+        the rwx-permissions as perm-string (e.g. 'rw') for the (original) mode.
+        '''
+        r_flag, w_flag = self.MASKS[source]['r'], self.MASKS[source]['w']
+        x_flag = self.MASKS[source]['x']
+        return lambda omode: (
+            ('r' if omode & r_flag else '') +
+            ('w' if omode & w_flag else '') +
+            ('x' if omode & x_flag else ''))
+
+    def fg_get_mode_for_target(self, target):
+        '''
+        return function which generatas bitmask for target
+        for the rwx-permissions (e.g. 'rw') input.
+        '''
+        r_flag, w_flag = self.MASKS[target]['r'], self.MASKS[target]['w']
+        x_flag = self.MASKS[target]['x']
+        return lambda rwx_str: (
+            (r_flag if 'r' in rwx_str else 0) |
+            (w_flag if 'w' in rwx_str else 0) |
+            (x_flag if 'x' in rwx_str else 0))
+
+    def get_mode_change_funcs(self, who, operator, perms):
+        '''returns mode-change-functions (mcf) for given action.'''
+
+        if perms == '' and operator in '+-':
+            return tuple()
+        mcfs, affected_bits = [], 0
+        if who == '':
+            clear_bits = self.MASKS['a']['rwxst']
+            affected_bits = clear_bits & ~self.get_umask()
+        else:
+            for target in who:
+                affected_bits |= self.MASKS[target]['rwxst']
+            clear_bits = affected_bits
+
+        if operator == '=':
+            mcfs.append(lambda omode, lmode: lmode & ~clear_bits)
+
+        if len(perms) == 1  and  perms in 'ugo':    # permcopy
+            source_rwx_func = self.fg_extract_rwx_for_source(perms)
+            target_mask_func = self.fg_get_mode_for_target('a')
+            mode2affected = lambda mode: (
+                affected_bits & target_mask_func(source_rwx_func(mode)))
+            mcfs.append(
+                (lambda omode, lmode: lmode | mode2affected(omode)) if
+                  operator in '+=' else
+                (lambda omode, lmode: lmode & ~(mode2affected(omode))))
+        else:
+            mask, a_x = 0, self.MASKS['a']['x']
+            if operator == '+'  and  'X' in perms:
+                mcfs.append(lambda omode, lmode: (
+                    lmode | (a_x & affected_bits) if stat.S_ISDIR(omode) or
+                        (omode & a_x) else lmode))
+            perms = re.sub('X', '', perms)
+            for perm in perms:
+                if who == '':
+                    mask |= self.MASKS['a'][perm]
+                else:
+                    for target in who:
+                        mask |= self.MASKS[target][perm]
+            aff_mask = mask & affected_bits
+            mcfs.append(
+                (lambda omode, lmode: lmode | aff_mask) if operator in '+=' else
+                (lambda omode, lmode: lmode & ~aff_mask))
+
+        return mcfs
+
+    def parse_mode(self, mode_str):
+        '''
+        parse given mode.
+
+        returns a list of mode-change-functions (mcf) with each mcf
+            mcf(orig_mode, last_computed_mode) -> new_computed_mode
+            or
+            mcf(orig_mode, last_computed_mode) -> new_orig_mode, new_computed_mode
+        '''
+        mcfs = []
+        if re.match(self.OCTAL_MODE_RE, mode_str):
+            try:
+                mode = int(mode_str, 8)
+                if mode < 0  or mode > 0o7777:
+                    raise ValueError()
+                mcfs.append(lambda omode, lmode: mode)
+            except ValueError:
+                self.fm.notify(
+                    "Need an octal number between 0o0 and 0o7777!", bad=True)
+            return mcfs
+
+        set_omode = lambda omode, lmode: (lmode | (omode & ~0o7777), lmode)
+
+        for clause in mode_str.split(','):
+            who_match = re.match(self.WHO_RE, clause)  # always matches
+            who = who_match.group(1)
+            clause = clause[who_match.end(0):]
+
+            while clause != '':
+                action_match = re.match(self.ACTION_RE, clause)
+                if action_match is None:
+                    self.fm.notify("Cannot parse part " + clause, bad=True)
+                    return []
+                clause = clause[action_match.end(0):]
+                mcfs.extend(self.get_mode_change_funcs(
+                    who, action_match.group(1), action_match.group(2)))
+            mcfs.append(set_omode)
+        return mcfs
+
     def execute(self):
+        '''execute chmod command.'''
         mode_str = self.rest(1)
         if not mode_str:
             if self.quantifier is None:
-                self.fm.notify("Syntax: chmod <octal number> "
-                               "or specify a quantifier", bad=True)
+                self.fm.notify(
+                    "Syntax: chmod <octal number>|<symbolic mode><octal number> "
+                    "or specify a quantifier", bad=True)
                 return
             mode_str = str(self.quantifier)
-
-        try:
-            mode = int(mode_str, 8)
-            if mode < 0 or mode > 0o777:
-                raise ValueError
-        except ValueError:
-            self.fm.notify("Need an octal number between 0 and 777!", bad=True)
+        mcf_list = self.parse_mode(mode_str)
+        if not mcf_list:
             return
-
+        changed = False
         for fobj in self.fm.thistab.get_selection():
             try:
-                os.chmod(fobj.path, mode)
-            except OSError as ex:
-                self.fm.notify(ex)
-
-        # reloading directory.  maybe its better to reload the selected
-        # files only.
-        self.fm.thisdir.content_outdated = True
+                omode = os.stat(fobj.path).st_mode
+                lmode = omode
+                for mask_op in mcf_list:
+                    result = mask_op(omode, lmode)
+                    if isinstance(result, tuple):
+                        omode, lmode = result
+                    else:
+                        lmode = result
+                os.chmod(fobj.path, lmode)
+                changed = True
+            except OSError as exp:
+                self.fm.notify(exp)
+        if changed:
+            self.fm.thisdir.content_outdated = True
 
 
 class bulkrename(Command):
