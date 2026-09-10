@@ -13,9 +13,12 @@ except ImportError:
     from itertools import zip_longest
 # pylint: enable=invalid-name
 from os.path import abspath
+from subprocess import call, TimeoutExpired
 
 from ranger.core.shared import FileManagerAware
+from ranger.ext.cached_function import cached_function
 from ranger.ext.hash import hash_chunks
+from ranger.ext.popen23 import DEVNULL
 
 # pylint: disable=too-few-public-methods
 
@@ -89,6 +92,24 @@ class MimeFilter(BaseFilter, FileManagerAware):
 
     def __str__(self):
         return "<Filter: mimetype =~ /{pat}/>".format(pat=self.regex.pattern)
+
+
+@stack_filter("command")
+class CommandFilter(BaseFilter, FileManagerAware):
+    def __init__(self, command):
+        self.command = command
+
+    @cached_function
+    def __call__(self, fobj):
+        try:
+            return call([self.command + " " + fobj.path],
+                        shell=True, timeout=10,
+                        stdout=DEVNULL, stderr=DEVNULL) == 0
+        except (OSError, TimeoutExpired):
+            return False
+
+    def __str__(self):
+        return "<Filter: command '{cmd}'>".format(cmd=self.command)
 
 
 @stack_filter("hash")
