@@ -4,9 +4,13 @@
 from __future__ import (absolute_import, division, print_function)
 
 import curses
+from logging import getLogger
 
 from ranger.core.shared import FileManagerAware
 from ranger.gui.curses_shortcuts import CursesShortcuts
+
+
+LOG = getLogger(__name__)
 
 try:
     from bidi.algorithm import get_display  # pylint: disable=import-error
@@ -161,14 +165,13 @@ class Displayable(  # pylint: disable=too-many-instance-attributes
                 wid = maxx - x
 
             if x < 0 or y < 0:
-                self.fm.notify("Warning: Subwindow origin below zero for <%s> "
-                               "(x = %d, y = %d)" % (self, x, y), bad=True)
+                LOG.debug("Warning: Subwindow origin below zero for <%s> "
+                          "(x = %d, y = %d)", self, x, y)
 
             if x + wid > maxx or y + hei > maxy:
-                self.fm.notify(
+                LOG.debug(
                     "Warning: Subwindow size out of bounds for <%s> "
-                    "(x = %d, y = %d, hei = %d, wid = %d)" % (self, x, y, hei, wid),
-                    bad=True,
+                    "(x = %d, y = %d, hei = %d, wid = %d)", self, x, y, hei, wid,
                 )
 
         window_is_cleared = False
