@@ -124,15 +124,19 @@ class WideString(object):  # pylint: disable=too-few-public-methods
         >>> WideString("aモ")[0:1]
         <WideString 'a'>
         """
-        if stop is None or stop > len(self.chars):
-            stop = len(self.chars)
+        length = len(self)
+
+        if stop is None or stop > length:
+            stop = length
         if stop < 0:
-            stop = len(self.chars) + stop
-        if stop < 0:
-            return WideString("")
-        if start is None or start < 0:
+            stop = max(0, length + stop)
+        if start is None:
             start = 0
-        if stop < len(self.chars) and self.chars[stop] == '':
+        if start < 0:
+            start = max(0, length + start)
+        if start >= length or start >= stop:
+            return WideString("")
+        if stop < length and self.chars[stop] == '':
             if self.chars[start] == '':
                 return WideString(' ' + ''.join(self.chars[start:stop - 1]) + ' ')
             return WideString(''.join(self.chars[start:stop - 1]) + ' ')
@@ -140,7 +144,7 @@ class WideString(object):  # pylint: disable=too-few-public-methods
             return WideString(' ' + ''.join(self.chars[start:stop - 1]))
         return WideString(''.join(self.chars[start:stop]))
 
-    def __getitem__(self, i):
+    def __getitem__(self, item):
         """
         >>> WideString("asdf")[2]
         <WideString 'd'>
@@ -149,9 +153,10 @@ class WideString(object):  # pylint: disable=too-few-public-methods
         >>> WideString("……")[1]
         <WideString '…'>
         """
-        if isinstance(i, slice):
-            return self.__getslice__(i.start, i.stop)
-        return self.__getslice__(i, i + 1)
+        if isinstance(item, slice):
+            assert item.step is None or item.step == 1
+            return self.__getslice__(item.start, item.stop)
+        return self.__getslice__(item, item + 1)
 
     def __len__(self):
         """
