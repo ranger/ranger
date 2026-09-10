@@ -91,6 +91,43 @@ class MimeFilter(BaseFilter, FileManagerAware):
         return "<Filter: mimetype =~ /{pat}/>".format(pat=self.regex.pattern)
 
 
+@stack_filter("size")
+class SizeFilter(BaseFilter, FileManagerAware):
+    # size argument is a string of the form [+-<>=]?[0-9]+[KMG]
+    def __init__(self, size):
+        if size[0] == "+" or size[0] == ">":
+            self.operator = ">"
+            size = size[1:]
+        elif size[0] == "-" or size[0] == "<":
+            self.operator = "<"
+            size = size[1:]
+        elif size[0] == "=":
+            self.operator = "="
+            size = size[1:]
+        else:
+            self.operator = "="
+        size = size.replace(" ", "")
+        if size[-1].lower() == "k":
+            self.size = int(size[:-1]) * 2 ** 10
+        elif size[-1].lower() == "m":
+            self.size = int(size[:-1]) * 2 ** 20
+        elif size[-1].lower() == "g":
+            self.size = int(size[:-1]) * 2 ** 30
+        else:
+            self.size = int(size)
+
+    def __call__(self, fobj):
+        if self.operator == ">":
+            return fobj.size > self.size
+        elif self.operator == "<":
+            return fobj.size < self.size
+        return fobj.size == self.size
+
+    def __str__(self):
+        return "<Filter: size {op} {size} Byte>".format(op=self.operator,
+                                                        size=self.size)
+
+
 @stack_filter("hash")
 class HashFilter(BaseFilter, FileManagerAware):
     def __init__(self, filepath=None):
