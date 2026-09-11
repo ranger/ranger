@@ -1300,7 +1300,12 @@ class bulkrename(Command):
             # script was modified by the user
             self.fm.execute_file([File(cmdfile.name)], app='editor')
             cmdfile.seek(0)
-            script_was_edited = (script_content != cmdfile.read())
+            if PY3:
+                script_was_edited = (
+                    script_content != cmdfile.read().decode(
+                        encoding="utf-8", errors="surrogateescape"))
+            else:
+                script_was_edited = (script_content != cmdfile.read())
 
             # Do the renaming
             self.fm.run(['/bin/sh', cmdfile.name], flags=self.flags)
@@ -1321,7 +1326,7 @@ class bulkrename(Command):
             if tags_changed:
                 self.fm.tags.dump()
         else:
-            fm.notify("files have not been retagged")
+            self.fm.notify("files have not been retagged")
 
 
 class relink(Command):
