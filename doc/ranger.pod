@@ -1069,6 +1069,13 @@ Draw borders around or between the columns? Possible values are:
  separators     draw only vertical lines between columns
  both           both of the above
 
+=item draw_borders_glyphset [string]
+
+Define the glyph set used for drawing borders and separators. When unset, this
+defaults to the standard Alternative Character Set (ACS) "─│┌┬┐├┼┤└┴┘". The 11
+Characters must be given in this exact order (chosen for aesthetics): HLINE,
+VLINE, ULCORNER, TTEE, URCORNER, LTEE, PLUS, RTEE, LLCORNER, BTEE, LRCORNER.
+
 =item draw_borders_multipane [string]
 
 Draw borders around or between the panes. This setting overrides

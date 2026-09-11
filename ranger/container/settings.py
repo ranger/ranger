@@ -42,6 +42,7 @@ ALLOWED_SETTINGS = {
     "display_free_space_in_status_bar": bool,
     'display_tags_in_all_columns': bool,
     'draw_borders': str,
+    'draw_borders_glyphset': (str, type(None)),
     'draw_borders_multipane': str,
     'draw_progress_bar_in_status_bar': bool,
     'filter_dead_tabs_on_startup': bool,

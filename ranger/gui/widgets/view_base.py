@@ -6,9 +6,44 @@
 from __future__ import (absolute_import, division, print_function)
 
 import curses
+from ranger.container import settings
 from ranger.ext.keybinding_parser import key_to_string
 from . import Widget
 from ..displayable import DisplayableContainer
+
+
+class BorderGlyphset(  # pylint: disable=too-few-public-methods,too-many-instance-attributes
+        object):
+
+    def __init__(  # pylint: disable=invalid-name
+            self, glyphstr):
+        if glyphstr is None or glyphstr == "":
+            # default ACS glyphs: ─│┌┬┐├┼┤└┴┘
+            self.HLINE = curses.ACS_HLINE
+            self.VLINE = curses.ACS_VLINE
+            self.ULCORNER = curses.ACS_ULCORNER
+            self.TTEE = curses.ACS_TTEE
+            self.URCORNER = curses.ACS_URCORNER
+            self.LTEE = curses.ACS_LTEE
+            self.PLUS = curses.ACS_PLUS
+            self.RTEE = curses.ACS_RTEE
+            self.LLCORNER = curses.ACS_LLCORNER
+            self.BTEE = curses.ACS_BTEE
+            self.LRCORNER = curses.ACS_LRCORNER
+        else:
+            (
+                self.HLINE,
+                self.VLINE,
+                self.ULCORNER,
+                self.TTEE,
+                self.URCORNER,
+                self.LTEE,
+                self.PLUS,
+                self.RTEE,
+                self.LLCORNER,
+                self.BTEE,
+                self.LRCORNER,
+            ) = glyphstr
 
 
 class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instance-attributes
@@ -21,11 +56,17 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
         DisplayableContainer.__init__(self, win)
 
         self.fm.signal_bind('move', self.request_clear)
+        self.settings.signal_bind('setopt.draw_borders_glyphset', self._reset_glyphset,
+                                  priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
         self.old_draw_borders = self.settings.draw_borders
+        self._reset_glyphset()
 
         self.columns = None
         self.main_column = None
         self.pager = None
+
+    def _reset_glyphset(self):
+        self.glyphs = BorderGlyphset(self.settings.draw_borders_glyphset)
 
     def request_clear(self):
         self.need_clear = True
@@ -63,6 +104,19 @@ class ViewBase(Widget, DisplayableContainer):  # pylint: disable=too-many-instan
                 self.fm.ui.win.move(col_y, col_x)
             except curses.error:
                 pass
+
+    def _draw_border_rectangle(self, left_start, right_end):
+        # Draw border lines
+        self.whline(0, left_start + 1, self.glyphs.HLINE, (right_end - left_start - 1))
+        self.whline(self.hei - 1, left_start + 1, self.glyphs.HLINE, (right_end - left_start - 1))
+        self.wvline(1, left_start, self.glyphs.VLINE, self.hei - 2)
+        self.wvline(1, right_end, self.glyphs.VLINE, self.hei - 2)
+
+        # Draw corners
+        self.addch(0, left_start, self.glyphs.ULCORNER)
+        self.addch(self.hei - 1, left_start, self.glyphs.LLCORNER)
+        self.addch(0, right_end, self.glyphs.URCORNER)
+        self.addch(self.hei - 1, right_end, self.glyphs.LRCORNER)
 
     def _draw_bookmarks(self):
         self.columns[-1].clear_image(force=True)

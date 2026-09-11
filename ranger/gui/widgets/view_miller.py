@@ -36,8 +36,6 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
         self.settings.signal_bind('setopt.column_ratios', self.rebuild,
                                   priority=settings.SIGNAL_PRIORITY_AFTER_SYNC)
 
-        self.old_draw_borders = self.settings.draw_borders
-
     def rebuild(self):
         for child in self.container:
             if isinstance(child, BrowserColumn):
@@ -113,8 +111,6 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
             self._draw_info(self.draw_info)
 
     def _draw_borders(self, border_types):  # pylint: disable=too-many-branches
-        win = self.win
-
         self.color('in_browser', 'border')
 
         left_start = 0
@@ -134,14 +130,10 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
             if right_end < left_start:
                 right_end = self.wid - 1
 
-        # Draw horizontal lines and the leftmost vertical line
+        # Draw the outline border
         if 'outline' in border_types:
             try:
-                # pylint: disable=no-member
-                win.hline(0, left_start, curses.ACS_HLINE, right_end - left_start)
-                win.hline(self.hei - 1, left_start, curses.ACS_HLINE, right_end - left_start)
-                win.vline(1, left_start, curses.ACS_VLINE, self.hei - 2)
-                # pylint: enable=no-member
+                self._draw_border_rectangle(left_start, right_end)
             except curses.error:
                 pass
 
@@ -158,34 +150,17 @@ class ViewMiller(ViewBase):  # pylint: disable=too-many-ancestors,too-many-insta
                 y = self.hei - 1
                 try:
                     # pylint: disable=no-member
-                    win.vline(1, x, curses.ACS_VLINE, y - 1)
+                    self.wvline(1, x, self.glyphs.VLINE, y - 1)
                     if 'outline' in border_types:
-                        self.addch(0, x, curses.ACS_TTEE, 0)
-                        self.addch(y, x, curses.ACS_BTEE, 0)
+                        self.addch(0, x, self.glyphs.TTEE, 0)
+                        self.addch(y, x, self.glyphs.BTEE, 0)
                     else:
-                        self.addch(0, x, curses.ACS_VLINE, 0)
-                        self.addch(y, x, curses.ACS_VLINE, 0)
+                        self.addch(0, x, self.glyphs.VLINE, 0)
+                        self.addch(y, x, self.glyphs.VLINE, 0)
                     # pylint: enable=no-member
                 except curses.error:
                     # in case it's off the boundaries
                     pass
-
-        if 'outline' in border_types:
-            # Draw the last vertical line
-            try:
-                # pylint: disable=no-member
-                win.vline(1, right_end, curses.ACS_VLINE, self.hei - 2)
-                # pylint: enable=no-member
-            except curses.error:
-                pass
-
-        if 'outline' in border_types:
-            # pylint: disable=no-member
-            self.addch(0, left_start, curses.ACS_ULCORNER)
-            self.addch(self.hei - 1, left_start, curses.ACS_LLCORNER)
-            self.addch(0, right_end, curses.ACS_URCORNER)
-            self.addch(self.hei - 1, right_end, curses.ACS_LRCORNER)
-            # pylint: enable=no-member
 
     def _collapse(self):
         # Should the last column be cut off? (Because there is no preview)

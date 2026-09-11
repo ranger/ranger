@@ -25,6 +25,7 @@ class CursesShortcuts(SettingsAware):
     color_at(y, x, wid, *keys) -- sets the color at the given position
     color_reset() -- resets the color to the default
     addstr(*args) -- failsafe version of self.win.addstr(*args)
+    whline/wvline(y, x, ch, n) -- unicode-capable hline/vline
     """
 
     def __init__(self):
@@ -67,6 +68,20 @@ class CursesShortcuts(SettingsAware):
             self.win.addch(*args)
         except (curses.error, TypeError):
             pass
+
+    def whline(self, y, x, ch, n):
+        if isinstance(ch, int):
+            self.win.hline(y, x, ch, n)
+        else:
+            for _x in range(x, x + n):
+                self.addch(y, _x, ch)
+
+    def wvline(self, y, x, ch, n):
+        if isinstance(ch, int):
+            self.win.vline(y, x, ch, n)
+        else:
+            for _y in range(y, y + n):
+                self.addch(_y, x, ch)
 
     def color(self, *keys):
         """Change the colors from now on."""
