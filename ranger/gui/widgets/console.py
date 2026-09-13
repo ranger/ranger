@@ -14,7 +14,7 @@ from io import open
 from ranger import PY3
 from ranger.gui.widgets import Widget
 from ranger.ext.direction import Direction
-from ranger.ext.widestring import uwid, WideString
+from ranger.ext.widestring import normalize, string_to_charlist, uwid, WideString
 from ranger.container.history import History, HistoryEmptyException
 import ranger
 
@@ -34,12 +34,13 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
     historypath = None
     wait_for_command_input = False
     unicode_buffer = ""
+    right_margin = 1
 
     def __init__(self, win):
         Widget.__init__(self, win)
-        self.pos = 0
-        self.line = ''
         self.history = History(self.settings.max_console_history_size)
+        self.pos = self.line = self.chars = None
+        self.clear()
         # load history from files
         if not ranger.args.clean:
             self.historypath = self.fm.datapath('history')
@@ -93,13 +94,33 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
         Widget.destroy(self)
 
     def _calculate_offset(self):
-        wid = self.wid - 2
+        wid = self.wid - (uwid(self.prompt) + self.right_margin)
         whalf = wid // 2
-        if self.pos < whalf or len(self.line) < wid:
-            return 0
-        if self.pos > len(self.line) - (wid - whalf):
-            return len(self.line) - wid
-        return self.pos - whalf
+        pos = self._calculate_screen_pos()
+        length = uwid(self.line)
+        if pos < whalf or length < wid:
+            offset = 0
+        elif pos > length - (wid - whalf):
+            offset = length - wid
+        else:
+            offset = pos - whalf
+        # Align the offset to a character boundary.
+        # This avoids an empty first column when there
+        # are wide characters:
+        # https://github.com/ranger/ranger/pull/3146#issuecomment-3416355601
+        chars = self._get_chars()
+        max_character_width = 2
+        for i in range(offset, length - wid + max_character_width):
+            if chars[i] != '':
+                return i
+        return offset
+
+    def _get_chars(self):
+        self.chars = self.chars or string_to_charlist(self.line)
+        return self.chars
+
+    def _calculate_screen_pos(self):
+        return uwid(self.line[:self.pos])
 
     def draw(self):
         self.win.erase()
@@ -110,10 +131,9 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             return
 
         self.addstr(0, 0, self.prompt)
-        line = WideString(self.line)
-        if line:
-            x = self._calculate_offset()
-            self.addstr(0, len(self.prompt), str(line[x:]))
+        line = WideString(self.line, chars=self._get_chars())
+        line = normalize(str(line[self._calculate_offset():]))
+        self.addstr(0, uwid(self.prompt), line)
 
     def finalize(self):
         move = self.fm.ui.win.move
@@ -124,9 +144,9 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
                 pass
         else:
             try:
-                x = self._calculate_offset()
-                pos = uwid(self.line[x:self.pos]) + len(self.prompt)
-                move(self.y, self.x + min(self.wid - 1, pos))
+                pos = self._calculate_screen_pos() - self._calculate_offset()
+                cursor = pos + 1
+                move(self.y, self.x + min(self.wid - 1, cursor))
             except curses.error:
                 pass
 
@@ -186,6 +206,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
     def clear(self):
         self.pos = 0
         self.line = ''
+        self.chars = None
 
     def press(self, key):
         self.fm.ui.keymaps.use_keymap('console')
@@ -578,6 +599,7 @@ class Console(Widget):  # pylint: disable=too-many-instance-attributes,too-many-
             self.on_line_change()
 
     def on_line_change(self):
+        self.chars = None
         self.history_search_pattern = self.line
         try:
             cls = self.get_cmd_class()

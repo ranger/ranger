@@ -4,7 +4,8 @@
 from __future__ import (absolute_import, division, print_function)
 
 from ranger import PY3
-from ranger.ext.widestring import WideString, utf_char_width
+from ranger.gui.ansi import char_slice
+from ranger.ext.widestring import normalize, uwid, WideString
 
 
 class Bar(object):
@@ -94,7 +95,7 @@ class BarSide(list):
         self.base_color_tag = base_color_tag
 
     def add(self, string, *lst, **kw):
-        colorstr = ColoredString(string, self.base_color_tag, *lst)
+        colorstr = ColoredString(normalize(string), self.base_color_tag, *lst)
         colorstr.__dict__.update(kw)
         self.append(colorstr)
 
@@ -123,22 +124,25 @@ class ColoredString(object):
         if not string or not self.string.chars:
             self.min_size = 0
         elif PY3:
-            self.min_size = utf_char_width(string[0])
+            self.min_size = uwid(self._slice(0, 1))
         else:
-            self.min_size = utf_char_width(self.string.chars[0].decode('utf-8'))
+            self.min_size = uwid(str(self._slice(0, 1)).decode('utf-8'))
 
-    def cut_off(self, n):
-        if n >= 1:
-            self.string = self.string[:-n]
+    def cut_off(self, width):
+        if width >= 1:
+            self.string = self._slice(0, width)
 
-    def cut_off_to(self, n):
-        if n < self.min_size:
-            self.string = self.string[:self.min_size]
-        elif n < len(self.string):
-            self.string = self.string[:n]
+    def cut_off_to(self, width):
+        if width < self.min_size:
+            self.string = self._slice(0, self.min_size)
+        elif width < len(self):
+            self.string = self._slice(0, width)
+
+    def _slice(self, start, stop):
+        return WideString(char_slice(self.string, start, stop))
 
     def __len__(self):
-        return len(self.string)
+        return uwid(str(self))
 
     def __str__(self):
         return str(self.string)

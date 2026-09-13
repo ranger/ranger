@@ -6,6 +6,7 @@
 from __future__ import (absolute_import, division, print_function)
 
 from ranger.ext.accumulator import Accumulator
+from ranger.ext.widestring import normalize
 
 from . import Widget
 
@@ -52,7 +53,7 @@ class TaskView(Widget, Accumulator):
                     if self.pointer == i:
                         clr.append('selected')
 
-                    descr = obj.get_description()
+                    descr = normalize(obj.get_description())
                     if obj.progressbar_supported and obj.percent >= 0 and obj.percent <= 100:
                         self.addstr(y, 0, "%3.2f%% - %s" % (obj.percent, descr), self.wid)
                         wid = int((self.wid / 100) * obj.percent)

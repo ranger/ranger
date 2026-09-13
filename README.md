@@ -87,6 +87,7 @@ For general usage:
 * `sudo` to use the "run as root" feature
 * `python-bidi` (Python package) to display right-to-left file names correctly
   (Hebrew, Arabic)
+* `wcwidth` (Python package) to display combining/non-spacing Unicode characters right way (e.g. Bengali, Thai)
 
 For enhanced file previews (with `scope.sh`):
 

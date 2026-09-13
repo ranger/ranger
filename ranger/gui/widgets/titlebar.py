@@ -10,6 +10,8 @@ from __future__ import (absolute_import, division, print_function)
 
 from os.path import basename
 
+from ranger.ext.widestring import normalize, uwid, WideString
+from ranger.gui.ansi import char_slice
 from ranger.gui.bar import Bar
 
 from . import Widget
@@ -23,6 +25,7 @@ class TitleBar(Widget):
     right_sumsize = 0
     throbber = ' '
     need_redraw = False
+    max_dirname_width = 15
 
     def __init__(self, *args, **keywords):
         Widget.__init__(self, *args, **keywords)
@@ -59,7 +62,7 @@ class TitleBar(Widget):
         pos = self.wid - 1
         for tabname in reversed(self.fm.get_tab_list()):
             tabtext = self._get_tab_text(tabname)
-            pos -= len(tabtext)
+            pos -= uwid(tabtext)
             if event.x > pos:
                 self.fm.tab_open(tabname)
                 self.need_redraw = True
@@ -67,7 +70,7 @@ class TitleBar(Widget):
 
         pos = 0
         for i, part in enumerate(self.result):
-            pos += len(part)
+            pos += uwid(part)
             if event.x < pos:
                 if self.settings.hostname_in_titlebar and i <= 2:
                     self.fm.enter_dir("~")
@@ -154,8 +157,11 @@ class TitleBar(Widget):
             dirname = basename(self.fm.tabs[tabname].path)
             if not dirname:
                 result += ":/"
-            elif len(dirname) > 15:
-                result += ":" + dirname[:14] + self.ellipsis[self.settings.unicode_ellipsis]
+            elif uwid(dirname) > self.max_dirname_width:
+                ellipsis = self.ellipsis[self.settings.unicode_ellipsis]
+                stop = self.max_dirname_width - uwid(ellipsis)
+                cut = char_slice(normalize(dirname), 0, stop)
+                result += ":" + cut + ellipsis
             else:
                 result += ":" + dirname
         return result
@@ -165,5 +171,5 @@ class TitleBar(Widget):
         for part in result:
             self.color(*part.lst)
             y, x = self.win.getyx()
-            self.addstr(y, x, str(part))
+            self.addstr(y, x, normalize(str(part)))
         self.color_reset()
