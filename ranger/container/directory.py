@@ -490,6 +490,8 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     def unload(self):
         self.loading = False
         self.load_generator = None
+        self.size__reset()
+        self.runnable__reset()
 
     def load_content(self, schedule=None):
         """Loads the contents of the directory.
@@ -594,7 +596,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
         except OSError:
             self.infostring = BAD_INFO
             self.accessible = False
-            self.runnable = False
+            self._runnable = False
             return 0
         else:
             if size is None:
@@ -602,7 +604,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
             else:
                 self.infostring = ' %d' % size
             self.accessible = True
-            self.runnable = True
+            self._runnable = True
             return size
 
     @lazy_property
@@ -615,7 +617,7 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
     @lazy_property
     def runnable(self):  # pylint: disable=method-hidden
         self.size  # trigger the lazy property initializer pylint: disable=pointless-statement
-        return self.runnable
+        return self._runnable
 
     def sort_if_outdated(self):
         """Sort the containing files if they are outdated"""
