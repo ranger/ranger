@@ -30,7 +30,7 @@ from ranger.core.runner import Runner
 from ranger.core.tab import Tab
 from ranger.ext import logutils
 from ranger.ext.img_display import get_image_displayer
-from ranger.ext.posix_signals import call_signal_handler, delay_signal
+from ranger.ext.posix_signals import call_signal_handler, delay_signal, handle_signal
 from ranger.ext.rifle import Rifle
 from ranger.ext.signals import SignalDispatcher
 from ranger.gui.ui import UI
@@ -232,6 +232,20 @@ class FM(Actions,  # pylint: disable=too-many-instance-attributes
                 self.ui.initialize()
 
         signal.signal(signal.SIGTSTP, sigtstp_handler)
+
+        # Some programs (e.g. fish, zsh), when run under Ranger, may
+        # change the terminal's foreground process group and put
+        # Ranger in the background. Ranger is unable to resume
+        # in these cases since it's now considered a background process.
+        # So whenever a child exits, make sure to
+        # restore Ranger as the foreground process group again.
+        def sigchld_handler(_signum, _frame):
+            # tcsetpgrp() will fail if we're in the background,
+            # unless we also ignore SIGTTOU.
+            with handle_signal(signal.SIGTTOU, signal.SIG_IGN):
+                os.tcsetpgrp(0, os.getpgrp())
+
+        signal.signal(signal.SIGCHLD, sigchld_handler)
 
         self.rifle.hook_logger = self.notify
         old_preprocessing_hook = self.rifle.hook_command_preprocessing
