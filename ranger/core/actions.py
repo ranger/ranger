@@ -376,7 +376,7 @@ class Actions(  # pylint: disable=too-many-instance-attributes,too-many-public-m
         # pylint: disable=unspecified-encoding
         with open(filename, 'r', encoding="utf-8") as fobj:
             for line in fobj:
-                line = line.strip(" \r\n")
+                line = line.strip("\r\n")
                 if line.startswith("#") or not line.strip():
                     continue
                 try:
