@@ -19,6 +19,7 @@ class MouseEvent(object):
     def __init__(self, getmouse):
         """Creates a MouseEvent object from the result of win.getmouse()"""
         _, self.x, self.y, _, self.bstate = getmouse
+        self.direction = self.mouse_wheel_direction()
 
         # x-values above ~220 suddenly became negative, apparently
         # it's sufficient to add 0xFF to fix that error.
