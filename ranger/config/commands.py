@@ -89,6 +89,8 @@
 # of ranger.
 # ===================================================================
 
+# pylint: disable=invalid-name,too-many-lines
+
 from __future__ import (absolute_import, division, print_function)
 
 from collections import deque
@@ -763,7 +765,7 @@ class delete(Command):
         confirm = self.fm.settings.confirm_on_delete
         if confirm != 'never' and (confirm != 'multiple' or many_files):
             self.fm.ui.console.ask(
-                "Confirm deletion of: %s (y/N)" % ', '.join(files),
+                "Confirm deletion of %s items: %s (y/N)" % (len(files), ', '.join(files)),
                 partial(self._question_callback, files),
                 ('n', 'N', 'y', 'Y'),
             )
@@ -829,7 +831,7 @@ class trash(Command):
 
         if confirm != 'never' and (confirm != 'multiple' or many_files):
             self.fm.ui.console.ask(
-                "Confirm deletion of: %s (y/N)" % ', '.join(file_names),
+                "Confirm deletion of %s items: %s (y/N)" % (len(files), ', '.join(file_names)),
                 partial(self._question_callback, files),
                 ('n', 'N', 'y', 'Y'),
             )
@@ -1226,7 +1228,7 @@ class chmod(Command):
 
 
 class bulkrename(Command):
-    """:bulkrename
+    """:bulkrename [-FLAGS...]
 
     This command opens a list of selected files in an external editor.
     After you edit and save the file, it will generate a shell script
@@ -1743,13 +1745,22 @@ class narrow(Command):
 
     Show only the files selected right now. If no files are selected,
     disable narrowing.
+
+    To disable narrow mode when selection is still active, use the
+    :unnarrow command.
     """
+
     def execute(self):
-        if self.fm.thisdir.marked_items:
+        # Calling :narrow enables narrow mode unless it is called with a
+        # case-insensitive `false` argument
+        narrow_mode = self.arg(1).lower() != "false"
+
+        if narrow_mode and self.fm.thisdir.marked_items:
             selection = [f.basename for f in self.fm.thistab.get_selection()]
             self.fm.thisdir.narrow_filter = selection
         else:
             self.fm.thisdir.narrow_filter = None
+
         self.fm.thisdir.refilter()
 
 

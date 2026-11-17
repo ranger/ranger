@@ -76,6 +76,10 @@ reverse = curses.A_REVERSE
 underline = curses.A_UNDERLINE
 invisible = curses.A_INVIS
 dim = curses.A_DIM
+try:
+    italic = curses.A_ITALIC
+except AttributeError:
+    italic = curses.A_NORMAL
 
 default_colors = (default, default, normal)
 # pylint: enable=invalid-name

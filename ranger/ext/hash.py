@@ -7,6 +7,8 @@ from os import listdir
 from os.path import getsize, isdir
 from hashlib import sha256
 
+from ranger import PY3
+
 # pylint: disable=invalid-name
 
 
@@ -14,7 +16,10 @@ def hash_chunks(filepath, h=None):
     if not h:
         h = sha256()
     if isdir(filepath):
-        h.update(filepath)
+        if PY3:
+            h.update(filepath.encode('utf8', 'surrogateescape'))
+        else:
+            h.update(filepath)
         yield h.hexdigest()
         for fp in listdir(filepath):
             for fp_chunk in hash_chunks(fp, h=h):

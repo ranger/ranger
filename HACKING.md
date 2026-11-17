@@ -27,8 +27,8 @@ Send patches, created with `git format-patch`, to the email address
 or open a pull request on GitHub.
 
 Please use PGP-encryption for security-relevant patches or messages. PGP key
-IDs are shared along with releases on https://ranger.github.io and can be
-attempted in reverse chronological order in case a maintainer is unresponsive.
+IDs are shared along with releases on https://ranger.fm and can be attempted in
+reverse chronological order in case a maintainer is unresponsive.
 
 Version Numbering
 -----------------

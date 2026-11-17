@@ -2,7 +2,6 @@ from __future__ import (absolute_import, division, print_function)
 
 from ranger.container import history
 
-
 HISTORY_TEST_ENTRIES = [str(k) for k in range(20)]
 OTHER_TEST_ENTRIES = [str(k) for k in range(40, 45)]
 
@@ -90,6 +89,29 @@ def testhistorybasic():
     # modify, modifies the top of the stack
     hist.modify("23")
     assert hist.current() == "23"
+
+
+def test_history_without_max_length():
+    unlimited_history = history.History(maxlen=None)
+    for entry in OTHER_TEST_ENTRIES:
+        unlimited_history.add(entry)
+    assert len(unlimited_history) == len(OTHER_TEST_ENTRIES)
+    # we create a copy to test the rebase
+    limited_history = history.History(maxlen=10)
+    for entry in HISTORY_TEST_ENTRIES:
+        limited_history.add(entry)
+    assert len(limited_history) == 10
+    # add a new entry to the unlimited history to check the top
+    top_entry = "1000"
+    unlimited_history.add(top_entry)
+    assert len(unlimited_history) == len(OTHER_TEST_ENTRIES) + 1
+    # check that unlimited history can handle rebase
+    unlimited_history.rebase(limited_history)
+    assert len(unlimited_history) == 11
+    assert len(limited_history) == 10
+    # check the rebase performed successfully
+    assert unlimited_history.current() == top_entry
+    assert list(unlimited_history)[len(unlimited_history) - 2] == limited_history.current()
 
 
 def testhistoryunique():

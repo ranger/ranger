@@ -12,7 +12,7 @@ from __future__ import (absolute_import, division, print_function)
 import ranger.api
 
 
-HOOK_INIT_OLD = ranger.api.hook_init
+original_hook = ranger.api.hook_init
 
 
 def hook_init(fm):
@@ -50,7 +50,7 @@ def hook_init(fm):
         # IPC support disabled
         pass
     finally:
-        HOOK_INIT_OLD(fm)
+        original_hook(fm)
 
 
 ranger.api.hook_init = hook_init

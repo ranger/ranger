@@ -15,4 +15,6 @@
 
 * See `HACKING.md`
 
+We are currently not accepting source code contributions that were generated with LLMs.
+
 Thank you!

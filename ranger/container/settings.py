@@ -71,6 +71,7 @@ ALLOWED_SETTINGS = {
     'preview_max_size': int,
     'preview_script': (str, type(None)),
     'relative_current_zero': bool,
+    'renumber_tabs_on_tab_close': bool,
     'save_backtick_bookmark': bool,
     'save_console_history': bool,
     'save_tabs_on_exit': bool,
@@ -172,7 +173,7 @@ class Settings(SignalDispatcher, FileManagerAware):
 
         elif name == 'preview_script':
             if isinstance(value, str):
-                result = os.path.expanduser(value)
+                result = os.path.expanduser(os.path.expandvars(value))
                 if os.path.exists(result):
                     signal.value = result
                 else:

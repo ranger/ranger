@@ -4,8 +4,8 @@
 from __future__ import (absolute_import, division, print_function)
 
 import errno
-import math
 import os.path
+import os
 import select
 from collections import deque
 from io import open
@@ -54,10 +54,9 @@ class Loadable(object):
 class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instance-attributes
     progressbar_supported = True
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         copy_buffer,
-        *,
         do_cut=False,
         overwrite=False,
         dest=None,
@@ -74,33 +73,38 @@ class CopyLoader(Loadable, FileManagerAware):  # pylint: disable=too-many-instan
             self.one_file = self.copy_buffer[0]
         Loadable.__init__(self, self.generate(), 'Calculating size...')
 
-    def _calculate_size(self, step):
+    def _calculate_size(self):
         from os.path import join
         size = 0
         stack = [fobj.path for fobj in self.copy_buffer]
         while stack:
+            yield size
             fname = stack.pop()
             if os.path.islink(fname):
                 continue
             if os.path.isdir(fname):
-                stack.extend([join(fname, item) for item in os.listdir(fname)])
+                for item in os.listdir(fname):
+                    stack.append(join(fname, item))
+                    yield size
             else:
                 try:
                     fstat = os.stat(fname)
+                    size += fstat.st_size
                 except OSError:
-                    continue
-                size += max(step, math.ceil(fstat.st_size / step) * step)
-        return size
+                    pass
+        yield size
 
-    def generate(self):
+    def generate(self):  # pylint: disable=too-many-branches
         if not self.copy_buffer:
             return
 
         from ranger.ext import shutil_generatorized as shutil_g
         # TODO: Don't calculate size when renaming (needs detection)
-        bytes_per_tick = shutil_g.BLOCK_SIZE
-        size = max(1, self._calculate_size(bytes_per_tick))
-        size_str = " (" + human_readable(self._calculate_size(1)) + ")"
+        size = 0
+        for size in self._calculate_size():
+            yield
+        size = max(1, size)
+        size_str = " (" + human_readable(size) + ")"
         done = 0
         if self.do_cut:
             self.original_copy_buffer.clear()
@@ -166,11 +170,12 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
     finished = False
     process = None
 
-    def __init__(  # pylint: disable=too-many-arguments
+    def __init__(
+        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-positional-arguments
         self,
         args,
         descr,
-        *,
         silent=False,
         read=False,
         input=None,  # pylint: disable=redefined-builtin
@@ -198,6 +203,7 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
             PIPE if self.input else open(os.devnull, 'r', encoding="utf-8")
         )
         self.process = process = Popen(self.args, **popenargs)
+        fd_out, fd_err = process.stdout.fileno(), process.stderr.fileno()
         self.signal_emit('before', process=process, loader=self)
         if self.input:
             if PY3:
@@ -220,10 +226,11 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
         else:
             selectlist = []
             if self.read:
-                selectlist.append(process.stdout)
+                selectlist.append(fd_out)
             if not self.silent:
-                selectlist.append(process.stderr)
-            read_stdout = None
+                selectlist.append(fd_err)
+            chunk_size = 4096
+            read_stdout = read_stderr = None
             while process.poll() is None:
                 yield
                 if self.finished:
@@ -232,14 +239,18 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                     robjs, _, _ = select.select(selectlist, [], [], 0.03)
                     if robjs:
                         robjs = robjs[0]
-                        if robjs == process.stderr:
-                            read = robjs.readline()
-                            if PY3:
-                                read = safe_decode(read)
+                        # We use os.read because it blocks until it manages to
+                        # read something, rather than until it has read the
+                        # requested number of bytes or reaches EOF.
+                        if robjs == fd_err:
+                            read = os.read(robjs, chunk_size)
                             if read:
-                                self.fm.notify(read, bad=True)
-                        elif robjs == process.stdout:
-                            read = robjs.read(512)
+                                if read_stderr is None:
+                                    read_stderr = read
+                                else:
+                                    read_stderr += read
+                        elif robjs == fd_out:
+                            read = os.read(robjs, chunk_size)
                             if read:
                                 if read_stdout is None:
                                     read_stdout = read
@@ -260,6 +271,10 @@ class CommandLoader(  # pylint: disable=too-many-instance-attributes
                 if PY3:
                     read_stdout = safe_decode(read_stdout)
                 self.stdout_buffer += read_stdout
+            elif read_stderr:
+                if PY3:
+                    read_stderr = safe_decode(read_stderr)
+                self.fm.notify(read_stderr, bad=True)
         self.finished = True
         self.signal_emit('after', process=process, loader=self)
 
@@ -389,6 +404,8 @@ class Loader(FileManagerAware):
             self.fm.signal_emit("loader.destroy", loadable=item, fm=self.fm)
             item.destroy()
             del self.queue[index]
+            if len(self.queue) == 0:
+                self.status = None
             if item.progressbar_supported:
                 self.fm.ui.status.request_redraw()
 

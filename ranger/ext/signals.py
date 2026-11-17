@@ -17,6 +17,13 @@ deleted when trying to call them (in signal_emit), but if they are never
 called, they accumulate and should be manually deleted with
 signal_garbage_collect().
 
+WARNING: Signal.signal_bind(..., weak=True) is buggy on PyPy!
+
+As of 2025-10-31, PyPy has delayed garbage collection, which results in
+signal handlers being run on objects that should have been deleted already.
+DO NOT put side effects in signal handler functions that might cause changes on
+the file system for this reason.
+
 >>> def test_function(signal):
 ...     if 'display' in signal:
 ...         print(signal.display)
@@ -115,8 +122,8 @@ class SignalDispatcher(object):
                 handler.function = None
         self._signals = {}
 
-    def signal_bind(
-        self, signal_name, function, *, priority=0.5, weak=False, autosort=True
+    def signal_bind(  # pylint: disable=too-many-positional-arguments
+        self, signal_name, function, priority=0.5, weak=False, autosort=True
     ):
         """Bind a function to the signal.
 
@@ -280,5 +287,8 @@ class SignalDispatcher(object):
 
 if __name__ == '__main__':
     import doctest
+    import platform
     import sys
+    if platform.python_implementation() == 'PyPy':
+        sys.exit(0)
     sys.exit(doctest.testmod()[0])

@@ -112,10 +112,10 @@ class Direction(dict):
             if key in self:
                 self[key] = n
 
-    def move(  # pylint: disable=too-many-arguments
+    def move(
+        # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         direction,
-        *,
         override=None,
         minimum=0,
         maximum=9999,
@@ -174,7 +174,9 @@ class Direction(dict):
     def move_cycles(self):
         return self.get('_move_cycles', 0)
 
-    def select(self, lst, current, pagesize, *, override=None, offset=1):
+    def select(  # pylint: disable=too-many-positional-arguments
+        self, lst, current, pagesize, override=None, offset=1
+    ):
         dest = self.move(direction=self.down(), override=override,
                          current=current, pagesize=pagesize, minimum=0, maximum=len(lst) + 1)
         selection = lst[min(current, dest):max(current, dest) + offset]

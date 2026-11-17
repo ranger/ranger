@@ -203,6 +203,9 @@ class Directory(  # pylint: disable=too-many-instance-attributes,too-many-public
             return Vcs(self)
         return None
 
+    def clear_signal_handlers(self):
+        self._signal_functions = None
+
     def signal_function_factory(self, function):
         def signal_function():
             self.load_if_outdated()
