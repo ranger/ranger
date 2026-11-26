@@ -3,7 +3,7 @@
 
 # TODO: add a __getitem__ method to get the tag of a file
 
-from __future__ import (absolute_import, division, print_function)
+from __future__ import (absolute_import, division, print_function, unicode_literals)
 
 import string
 from io import open

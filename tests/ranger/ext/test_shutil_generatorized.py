@@ -1,5 +1,6 @@
 from __future__ import (absolute_import, division, print_function)
 
+from io import open
 import os
 
 from ranger.ext.shutil_generatorized import move
